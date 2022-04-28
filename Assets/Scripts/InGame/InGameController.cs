@@ -54,7 +54,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         foreach (EInGameState state in _handlers.Keys)
         {
-            _handlers[state].Init();
+            _handlers[state].Init(this);
         }
     }
 
@@ -91,16 +91,25 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     #region State Handler Class
     protected class StateHandlerLoading : IInGameStateHandler
     {
-        public void Init()
+        private bool _isConnectReady = false;
+        private InGameController _controller;
+        public void Init(InGameController controller)
         {
+            _controller = controller;
+            //매치서버 접속
         }
 
         public void Set()
         {
+            //내가 준비되면 상대방에게도 신호보냄
         }
 
         public void AdvanceTime(float dt_sec)
         {
+            if(_isConnectReady /*&&상대방 준비완료*/)
+            {
+                _controller.ChangeState(EInGameState.BATTLE); //배틀 스테이지로 넘어감
+            }
         }
 
         public void Dispose()
@@ -108,21 +117,32 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
 
     }
-
     protected class StateHandlerBattle : IInGameStateHandler
     {
-        public void Init()
+        private float _currentPlayTime;
+        private InGameController _controller;
+        public void Init(InGameController controller)
         {
+            _controller = controller;
+            _currentPlayTime = 0;
         }
 
         public void Set()
         {
+
         }
 
         public void AdvanceTime(float dt_sec)
         {
-        }
+            _currentPlayTime += dt_sec;
+            /*if (_currentPlayTime >= 일정 시간이 지나면)
+            {
+                상대방에게도 신호를 보내고
+                동기를 맞춘 후 upgrade state로 변경
+                _controller.ChangeState(EInGameState.UPGRADE); //업그레이드 스테이트로 변경
+            }*/
 
+        }
         public void Dispose()
         {
         }
@@ -131,16 +151,27 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
     protected class StateHandlerUpgrade : IInGameStateHandler
     {
-        public void Init()
+        private float _currentUpgradeTime = 0;
+        private InGameController _controller;
+        public void Init(InGameController controller)
         {
+            _controller = controller;
         }
 
         public void Set()
         {
+            _currentUpgradeTime = 0;
         }
 
         public void AdvanceTime(float dt_sec)
         {
+            _currentUpgradeTime += dt_sec;
+            /*if (_currentPlayTime >= 일정 시간이 지나면)
+            {
+                상대방에게도 신호를 보내고
+                동기를 맞춘 후 battle state로 변경
+                _controller.ChangeState(EInGameState.BATTLE); //업그레이드 스테이트로 변경
+            }*/
         }
 
         public void Dispose()
@@ -149,9 +180,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
     }
 
-    protected class StateHandlerPause : IInGameStateHandler
+    protected class StateHandlerPause : IInGameStateHandler //아마 연결이 끊기면 오게되는 state???
     {
-        public void Init()
+        public void Init(InGameController controller)
         {
         }
 
@@ -172,7 +203,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 }
 public interface IInGameStateHandler
 {
-    void Init();
+    void Init(InGameController controller);
     void Set();
     void AdvanceTime(float dt_sec);
     void Dispose();
