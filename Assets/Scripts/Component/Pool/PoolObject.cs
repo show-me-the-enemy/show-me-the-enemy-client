@@ -22,7 +22,6 @@ public class PoolObject : MonoBehaviour
         }
     }
     private bool _isEnable;
-    private Transform _poolLayer;
 
 
     public void SetData(string name)
