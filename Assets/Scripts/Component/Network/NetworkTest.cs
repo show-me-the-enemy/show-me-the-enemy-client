@@ -14,8 +14,13 @@ public class NetworkTest : MonoBehaviour
     private string login_id;
     private string login_password;
 
+    private string _userName ="testchsbin";
+    private string _password = "1234";
+    private string _matchingPassword = "1234";
+
     public enum APIType
     {
+        SignUp,
         Login,
         Logout
     }
@@ -41,11 +46,37 @@ public class NetworkTest : MonoBehaviour
             case APIType.Login:
                 yield return StartCoroutine(API_Login());
                 break;
+            case APIType.SignUp:
+                yield return StartCoroutine(API_SingUp());
+                break;
         }
         yield return null;
     }
 
     #region API_Func
+    /// <summary>
+    /// API로 가입하는 함수
+    /// </summary>
+    IEnumerator API_SingUp()
+    {
+        UnityWebRequest request;
+        using (request = UnityWebRequest.Post("http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com/api/auth/register:8080" + login_id + "&password=" + login_password, ""))
+        {
+            yield return request.SendWebRequest();
+            if (request.isNetworkError)
+            {
+                Debug.Log(request.error);
+            }
+            else
+            {
+                SetToken(request.downloadHandler.text);
+                if (request.responseCode != 200)
+                    ErrorCheck(-(int)request.responseCode, "API_Login");
+            }
+        }
+    }
+
+
     /// <summary>
     /// API로 로그인하여 토큰을 가져오는 함수
     /// 이때 가져온 토큰은 token 변수에 저장
