@@ -168,15 +168,21 @@ public enum ENotiMessage
 {
     UNKNOWN = 0,
 
-    //500 ~ 1000 GameSceneState 관련
+    //500 ~ 999 GameSceneState 관련
     ChangeSceneState = 500,
     //1000 ~ 2000 Bounce 관련
     OnBallHitGround = 1000,
     TestNoti,
+    //8000 ~ 9999 Network 관련
+    NetworkRequestLogin = 8000,
+    NetworkRequestSignUp,
 }
 
 public enum EDataParamKey
 {
     //숫자관련
     Integer, //일반 int 변수형 낱개로 보낼때
+    UserLoginRequest, //UserLogin class 보낼때
+    UserSignUpRequest, //UserSignUp class 보낼때
+
 }
