@@ -11,6 +11,9 @@ public class InGameApplication : BaseApplication
     [SerializeField]
     private InGameController _controller;
 
+    public CameraController cameraController;
+    public PlayerController playerController;
+
     public InGameModel Model
     {
         get { return _model; }

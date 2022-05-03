@@ -12,9 +12,6 @@ public class InGameManager : MonoBehaviour, System.IDisposable
     {
         _inGameApp.Init();
         _inGameApp.Set();
-
-        SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
-
     }
 
     // Update is called once per frame

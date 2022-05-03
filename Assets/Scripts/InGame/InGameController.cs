@@ -10,7 +10,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     {
         _app = app as InGameApplication;
         InitHandlers();
-        ChangeState(EInGameState.LOADING);
+        ChangeState(EInGameState.BATTLE);
     }
 
     public void Set()
@@ -125,6 +125,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         {
             _controller = controller;
             _currentPlayTime = 0;
+
+            _controller._app.playerController.Init();
+            _controller._app.cameraController.Init();
         }
 
         public void Set()
@@ -135,6 +138,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         public void AdvanceTime(float dt_sec)
         {
             _currentPlayTime += dt_sec;
+
+            _controller._app.playerController.AdvanceTime(dt_sec);
+            _controller._app.cameraController.AdvanceTime(dt_sec);
             /*if (_currentPlayTime >= 일정 시간이 지나면)
             {
                 상대방에게도 신호를 보내고
