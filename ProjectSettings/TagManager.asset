@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Coin
+  - Item
+  - Box
   layers:
   - Default
   - TransparentFX
@@ -13,14 +16,14 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Env
+  - Foot
+  - MonFoot
+  - Fire
+  - Object
+  - Collectable
+  - Player
+  - Monster
   - 
   - 
   - 
@@ -53,6 +56,6 @@ TagManager:
   - name: Monster
     uniqueID: 428206335
     locked: 0
-  - name: Player
+  - name: PPlayer
     uniqueID: 3078030833
     locked: 0

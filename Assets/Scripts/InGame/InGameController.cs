@@ -128,6 +128,14 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
             _controller._app.playerController.Init();
             _controller._app.cameraController.Init();
+            _controller._app.tileScroller.Init();
+            _controller._app.mobGenerator.Init();
+            foreach (Monster mob in _controller._app.monsters)
+            {
+                if(mob != null )
+                    mob.Init(); 
+            }
+
         }
 
         public void Set()
@@ -141,6 +149,14 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
             _controller._app.playerController.AdvanceTime(dt_sec);
             _controller._app.cameraController.AdvanceTime(dt_sec);
+            _controller._app.tileScroller.AdvanceTime(dt_sec);
+            _controller._app.mobGenerator.AdvanceTime(dt_sec);
+            foreach (Monster mob in _controller._app.monsters)
+            {
+                if(mob!= null )
+                    mob.AdvanceTime(dt_sec);
+            }
+
             /*if (_currentPlayTime >= 일정 시간이 지나면)
             {
                 상대방에게도 신호를 보내고

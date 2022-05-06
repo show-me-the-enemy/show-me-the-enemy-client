@@ -13,6 +13,10 @@ public class InGameApplication : BaseApplication
 
     public CameraController cameraController;
     public PlayerController playerController;
+    public TileScroller tileScroller;
+    public MobGenerator mobGenerator;
+
+    public Monster[] monsters = new Monster[100];
 
     public InGameModel Model
     {
