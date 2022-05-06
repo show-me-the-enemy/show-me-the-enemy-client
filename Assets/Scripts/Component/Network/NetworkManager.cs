@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-
+using UnityEngine.SceneManagement;
 public class NetworkManager : MonoBehaviour
 {
     #region Singelton
@@ -82,7 +83,10 @@ public class NetworkManager : MonoBehaviour
         {
             Debug.Log("On Noti UserLoginRequest"); 
             UserLoginRequest request = noti.data[EDataParamKey.UserLoginRequest] as UserLoginRequest;
-            StartCoroutine(API_Login(request));
+            StartCoroutine(API_Login(request, (callback) =>
+            {
+                SceneManager.LoadScene("InGameScene");
+            }));
         }
         else if(noti.data[EDataParamKey.UserSignUpRequest] != null)
         {
@@ -115,8 +119,9 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log(request.downloadHandler.text);
             }
         }
+
     }
-    IEnumerator API_Login(UserLoginRequest userRequest)
+    IEnumerator API_Login(UserLoginRequest userRequest, Action<UnityWebRequest> callback)
     {
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/auth/login";
         WWWForm form = new WWWForm();
@@ -145,7 +150,7 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log(res.message);
                 Debug.Log(res.refreshToken);
                 Debug.Log(res.statusCode);
-
+                callback(request);
             }
         }
     }
