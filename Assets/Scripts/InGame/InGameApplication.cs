@@ -11,6 +11,13 @@ public class InGameApplication : BaseApplication
     [SerializeField]
     private InGameController _controller;
 
+    public CameraController cameraController;
+    public PlayerController playerController;
+    public TileScroller tileScroller;
+    public MobGenerator mobGenerator;
+
+    public Monster[] monsters = new Monster[100];
+
     public InGameModel Model
     {
         get { return _model; }
