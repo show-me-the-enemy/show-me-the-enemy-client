@@ -7,39 +7,70 @@ public class LoginController : MonoBehaviour
     //원래 이부분은 view에 들어가야 마땅하나 login scene에 하도 큰 내용이 없어서
     //이 부분만 예외적으로 controller안에서 해결해두고
     //나중에 혹시 볼륨이 커지면 그때가서 분류
+    [SerializeField]
+    private GameObject _loginPopup;
+    [SerializeField]
+    private GameObject _signupPopup;
 
+    [SerializeField]
+    private InputField _usernameInputLogin;
+    [SerializeField]
+    private InputField _passwordInputLogin;
     [SerializeField]
     private Button _loginBtn;
+
+    [SerializeField]
+    private InputField _usernameInputSignUp;
+    [SerializeField]
+    private InputField _passwordInputSignUp;
+    [SerializeField]
+    private InputField _matchingPasswordInputSignUp;
     [SerializeField]
     private Button _signUpBtn;
-    [SerializeField]
-    private InputField _usernameInput;
-    [SerializeField]
-    private InputField _passwordInput;
-    [SerializeField]
-    private InputField _matchingPasswordInput;
 
+
+    public void OnClick_PopupActive(string input)
+    {
+        switch (input)
+        {
+            case "Login":
+                _loginPopup.SetActive(true);
+                break;
+            case "Signup":
+                _signupPopup.SetActive(true);
+                break;
+        }
+    }
     public void OnClick_Login()
     {
         Debug.Log("OnClick_Login");
         UserLoginRequest info = new UserLoginRequest();
-        info.username = _usernameInput.text;
-        info.password = _passwordInput.text;
+        info.username = _usernameInputLogin.text;
+        info.password = _passwordInputLogin.text;
 
         Hashtable sendData = new Hashtable();
         sendData.Add(EDataParamKey.UserLoginRequest, info);
         NotificationCenter.Instance.PostNotification(Notification.Instantiate(ENotiMessage.NetworkRequestLogin, sendData));
+        _loginPopup.SetActive(false);
     }
     public void OnClick_SignUp()
     {
         Debug.Log("OnClick_Signup");
         UserSignUpRequest info = new UserSignUpRequest();
-        info.username = _usernameInput.text;
-        info.password = _passwordInput.text;
-        info.matchingPassword = _matchingPasswordInput.text;
+        info.username = _usernameInputSignUp.text;
+        info.password = _passwordInputSignUp.text;
+        info.matchingPassword = _matchingPasswordInputSignUp.text;
 
         Hashtable sendData = new Hashtable();
         sendData.Add(EDataParamKey.UserSignUpRequest, info);
         NotificationCenter.Instance.PostNotification(Notification.Instantiate(ENotiMessage.NetworkRequestSignUp, sendData));
+        _signupPopup.SetActive(false);
     }
+
+    public void OnClick_ClosePopup()
+    {
+        _loginPopup.SetActive(false);
+        _signupPopup.SetActive(false);
+    }
+
 }
