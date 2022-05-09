@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using WebSocketSharp;
+using StompHelper;
 public class NetworkManager : MonoBehaviour
 {
     #region Singelton
@@ -75,6 +78,7 @@ public class NetworkManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.NetworkRequestLogin);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.NetworkRequestSignUp);
+    
     }
 
     public void OnNotification(Notification noti)
@@ -85,7 +89,7 @@ public class NetworkManager : MonoBehaviour
             UserLoginRequest request = noti.data[EDataParamKey.UserLoginRequest] as UserLoginRequest;
             StartCoroutine(API_Login(request, (callback) =>
             {
-                SceneManager.LoadScene("InGameScene");
+                SceneManager.LoadScene("LobbyScene");
             }));
         }
         else if(noti.data[EDataParamKey.UserSignUpRequest] != null)
@@ -96,6 +100,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    #region Login Register
     IEnumerator API_SignUp(UserSignUpRequest userRequest)
     {
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/auth/register";
@@ -150,9 +155,97 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log(res.message);
                 Debug.Log(res.refreshToken);
                 Debug.Log(res.statusCode);
-                callback(request);
+
+                try
+                {
+                    //_webSocket = new WebSocket("ws://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/ws-gameplay/websocket");
+                    //_webSocket.OnMessage += Recv;
+                    //_webSocket.OnClose += CloseConnect;
+                    callback(request);
+                }
+                catch
+                {
+
+                }
             }
         }
+    }
+    #endregion
+    //private void CloseConnect(object sender,CloseEventArgs e)
+    //{
+    //    DisconnectServer();
+    //}
+    //public void SendMessage(string msg)
+    //{
+
+    //}
+
+    //public void Recv(object sender, MessageEventArgs e)
+    //{
+
+    //}
+
+    //public void DisconnectServer()
+    //{
+    //    try
+    //    {
+    //        if (_webSocket == null)
+    //            return;
+    //        if (_webSocket.IsAlive)
+    //            _webSocket.Close();
+    //    }
+    //    catch(Exception e)
+    //    {
+    //        Debug.Log(e.ToString());
+    //    }
+    //}
+
+    //public void CreateRoom()
+    //{
+    //}
+
+    public void Sample()
+    {
+        using (var ws = new WebSocket("ws://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/ws-gameplay/websocket/api/games/start/"+_username))
+        {
+            ws.OnMessage += ws_OnMessage;
+            ws.OnOpen += ws_OnOpen;
+            ws.OnError += ws_OnError;
+            ws.Connect();
+            Thread.Sleep(1000);
+
+            StompMessageSerializer serializer = new StompMessageSerializer();
+
+            //var connect = new StompMessage("CONNECT");
+            //connect["accept-version"] = "1.2";
+            //connect["host"] = "";
+            //ws.Send(serializer.Serialize(connect)); 
+
+            var broad = new StompMessage("SEND");
+            broad["Authorization"] = "Bearer "+_accessToken;
+            ws.Send(serializer.Serialize(broad));
+
+            Console.ReadKey(true);
+
+        }
+    }
+
+    private void ws_OnOpen(object sender, EventArgs e)
+    {
+        Debug.Log(DateTime.Now.ToString() + " ws_OnOpen says: " + e.ToString());
+        
+    }
+
+    private void ws_OnMessage(object sender, MessageEventArgs e)
+    {
+        Debug.Log("-----------------------------");
+        Debug.Log(DateTime.Now.ToString() + " ws_OnMessage says: " + e.Data);
+
+    }
+
+    private void ws_OnError(object sender, ErrorEventArgs e)
+    {
+        Debug.Log(DateTime.Now.ToString() + " ws_OnError says: " + e.Message);
     }
 }
 
