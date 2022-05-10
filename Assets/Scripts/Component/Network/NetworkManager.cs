@@ -81,6 +81,15 @@ public class NetworkManager : MonoBehaviour
     
     }
 
+    public void CreateRoom()
+    {
+        StartCoroutine(API_RoomCreate());
+    }
+    public void JoinRoom()
+    {
+        StartCoroutine(API_RoomJoin());
+    }
+
     public void OnNotification(Notification noti)
     {
         if(noti.data[EDataParamKey.UserLoginRequest]!=null)
@@ -212,16 +221,7 @@ public class NetworkManager : MonoBehaviour
     }
     #endregion
 
-    public void CreateRoom()
-    {
-        StartCoroutine(API_RoomCreate());
-    }
-    public void JoinRoom()
-    {
-        StartCoroutine(API_RoomJoin());
-    }
-
-    public void ConnectSocket(int id)
+    private void ConnectSocket(int id)
     {
         var ws = new WebSocket("ws://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/ws-gameplay/websocket");
         ws.OnMessage += ws_OnMessage;
