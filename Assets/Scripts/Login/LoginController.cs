@@ -43,7 +43,6 @@ public class LoginController : MonoBehaviour
     }
     public void OnClick_Login()
     {
-        Debug.Log("OnClick_Login");
         UserLoginRequest info = new UserLoginRequest();
         info.username = _usernameInputLogin.text;
         info.password = _passwordInputLogin.text;
@@ -55,7 +54,6 @@ public class LoginController : MonoBehaviour
     }
     public void OnClick_SignUp()
     {
-        Debug.Log("OnClick_Signup");
         UserSignUpRequest info = new UserSignUpRequest();
         info.username = _usernameInputSignUp.text;
         info.password = _passwordInputSignUp.text;

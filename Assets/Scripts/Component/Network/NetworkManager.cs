@@ -85,7 +85,6 @@ public class NetworkManager : MonoBehaviour
     {
         if(noti.data[EDataParamKey.UserLoginRequest]!=null)
         {
-            Debug.Log("On Noti UserLoginRequest"); 
             UserLoginRequest request = noti.data[EDataParamKey.UserLoginRequest] as UserLoginRequest;
             StartCoroutine(API_Login(request, (callback) =>
             {
@@ -94,7 +93,6 @@ public class NetworkManager : MonoBehaviour
         }
         else if(noti.data[EDataParamKey.UserSignUpRequest] != null)
         {
-            Debug.Log("On Noti UserSignUpRequest");
             UserSignUpRequest request = noti.data[EDataParamKey.UserSignUpRequest] as UserSignUpRequest;
             StartCoroutine(API_SignUp(request));
         }
@@ -105,6 +103,7 @@ public class NetworkManager : MonoBehaviour
     {
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/auth/register";
         string json = JsonUtility.ToJson(userRequest);
+        Debug.Log(json);
         using (UnityWebRequest request = UnityWebRequest.Post(url, json))
         {
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(json);
@@ -151,10 +150,8 @@ public class NetworkManager : MonoBehaviour
                 _accessToken = res.accessToken;
                 _username = userRequest.username;
                 _password = userRequest.password;
-                Debug.Log(res.accessToken);
-                Debug.Log(res.message);
-                Debug.Log(res.refreshToken);
-                Debug.Log(res.statusCode);
+                string json = JsonUtility.ToJson(res);
+                Debug.Log(json);
                 callback(request);
             }
         }
@@ -181,7 +178,8 @@ public class NetworkManager : MonoBehaviour
             else
             {
                 GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(request.downloadHandler.text);
-                Debug.Log(res.id); Debug.Log(res.statusCode); Debug.Log(res.firstUsername); Debug.Log(res.secondUsername); Debug.Log(res.status);
+                string json = JsonUtility.ToJson(res);
+                Debug.Log(json);
                 ConnectSocket(res.id);
                 SceneManager.LoadScene("SampleScene");
             }

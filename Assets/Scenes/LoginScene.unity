@@ -1206,7 +1206,7 @@ MonoBehaviour:
   _usernameInputLogin: {fileID: 236458252}
   _passwordInputLogin: {fileID: 1722050611}
   _loginBtn: {fileID: 1830751764}
-  _usernameInputSignUp: {fileID: 1190754825}
+  _usernameInputSignUp: {fileID: 93124333}
   _passwordInputSignUp: {fileID: 1190754825}
   _matchingPasswordInputSignUp: {fileID: 994619575}
   _signUpBtn: {fileID: 102888675}
