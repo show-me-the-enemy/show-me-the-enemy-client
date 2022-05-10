@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FireController : MonoBehaviour
+public class SpriteEffect : MonoBehaviour
 {
     public void AutoDestory()
     {

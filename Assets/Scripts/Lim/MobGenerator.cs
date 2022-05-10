@@ -6,7 +6,7 @@ public class MobGenerator : MonoBehaviour
 {
     public Transform player;
     public InGameApplication gameApp;
-    float genDelaySec = 3.0f;
+    public float genDelaySec = 3.0f;
     int mobIdx = 0;
     public Monster[] MobPrefabs;
 
@@ -18,7 +18,7 @@ public class MobGenerator : MonoBehaviour
     // Start is called before the first frame update
     public void Init()
     {
-        StartCoroutine(genMonster());
+        Set();
     }
 
     // Update is called once per frame
@@ -33,10 +33,11 @@ public class MobGenerator : MonoBehaviour
         {
             Monster mob = Instantiate(MobPrefabs[0], getRandomPosition(), Quaternion.identity);
             mob.player = player;
-            mob.speed = 5;
+            //mob.speed = 5;
             mob.Init();
             mob.transform.parent = gameObject.transform;
             gameApp.monsters[mobIdx++] =mob;
+            genDelaySec -= 0.01f;
             yield return new WaitForSeconds(genDelaySec);
         }
     }
@@ -45,5 +46,14 @@ public class MobGenerator : MonoBehaviour
         float x = Random.Range(borderHalfWidth, borderHalfWidth + distRange);
         if (Random.value < 0.5f) x = -x;
         return new Vector2(x, y);
+    }
+    public void Set()
+    {
+        StopAllCoroutines();
+        StartCoroutine(genMonster());
+    }
+    public void Dispose()
+    {
+        StopAllCoroutines();
     }
 }

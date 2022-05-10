@@ -6,9 +6,32 @@ using UnityEngine;
 public class InGameController : BaseElement, BaseElement.IBaseController
 {
     private InGameApplication _app = new InGameApplication();
+    #region lim
+    public GameObject overPanel;
+    public GameObject buildupPanel;
+    private float roundStartTime;
+    public float roundLength = 30;
+    private float buildupStartTime;
+    public float buildupLength = 10;
+    public UiBarView topBar;
+
+    public void GameOver()
+    {
+        StartCoroutine(PopOverRoutine());
+        ChangeState(EInGameState.PAUSE);
+    }
+    IEnumerator PopOverRoutine()
+    {
+        yield return new WaitForSeconds(2f);
+        overPanel.SetActive(true);
+    }
+    #endregion
+
     public void Init()
     {
         _app = app as InGameApplication;
+        overPanel.SetActive(false);
+        buildupPanel.SetActive(false);
         InitHandlers();
         ChangeState(EInGameState.BATTLE);
     }
@@ -140,7 +163,13 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-
+            _controller._app.playerController.Set();
+            _controller._app.mobGenerator.Set();
+            foreach (Monster mob in _controller._app.monsters)
+            {
+                if (mob != null)
+                    mob.Set();
+            }
         }
 
         public void AdvanceTime(float dt_sec)
@@ -157,16 +186,23 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                     mob.AdvanceTime(dt_sec);
             }
 
-            /*if (_currentPlayTime >= 일정 시간이 지나면)
+            float prg_t = _currentPlayTime - _controller.roundStartTime;
+            _controller.topBar.setValue(1 - prg_t / _controller.roundLength);
+            if(prg_t > _controller.roundLength)
             {
-                상대방에게도 신호를 보내고
-                동기를 맞춘 후 upgrade state로 변경
-                _controller.ChangeState(EInGameState.UPGRADE); //업그레이드 스테이트로 변경
-            }*/
-
+                _controller.roundStartTime = _currentPlayTime;
+                _controller.ChangeState(EInGameState.UPGRADE);
+            }
         }
         public void Dispose()
         {
+            _controller._app.playerController.Dispose();
+            _controller._app.mobGenerator.Dispose();
+            foreach (Monster mob in _controller._app.monsters)
+            {
+                if (mob != null)
+                    mob.Dispose();
+            }
         }
 
     }
@@ -182,22 +218,26 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
+            _controller.buildupPanel.SetActive(true);
             _currentUpgradeTime = 0;
         }
 
         public void AdvanceTime(float dt_sec)
         {
             _currentUpgradeTime += dt_sec;
-            /*if (_currentPlayTime >= 일정 시간이 지나면)
+
+            float prg_t = _currentUpgradeTime - _controller.buildupStartTime;
+            _controller.topBar.setValue(1 - prg_t / _controller.buildupLength);
+            if (prg_t > _controller.buildupLength)
             {
-                상대방에게도 신호를 보내고
-                동기를 맞춘 후 battle state로 변경
-                _controller.ChangeState(EInGameState.BATTLE); //업그레이드 스테이트로 변경
-            }*/
+                _controller.buildupStartTime = _currentUpgradeTime;
+                _controller.ChangeState(EInGameState.BATTLE);
+            }
         }
 
         public void Dispose()
         {
+            _controller.buildupPanel.SetActive(false);
         }
 
     }
