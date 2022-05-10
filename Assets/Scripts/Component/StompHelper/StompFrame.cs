@@ -14,6 +14,7 @@ namespace StompHelper
         public const string SUBSCRIBE = "SUBSCRIBE";
         public const string UNSUBSCRIBE = "UNSUBSCRIBE";
         public const string SEND = "SEND";
+        public const string POST = "POST";
 
         //Server Response
         public const string CONNECTED = "CONNECTED";

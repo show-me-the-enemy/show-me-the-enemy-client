@@ -155,79 +155,93 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log(res.message);
                 Debug.Log(res.refreshToken);
                 Debug.Log(res.statusCode);
-
-                try
-                {
-                    //_webSocket = new WebSocket("ws://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/ws-gameplay/websocket");
-                    //_webSocket.OnMessage += Recv;
-                    //_webSocket.OnClose += CloseConnect;
-                    callback(request);
-                }
-                catch
-                {
-
-                }
+                callback(request);
             }
         }
     }
     #endregion
-    //private void CloseConnect(object sender,CloseEventArgs e)
-    //{
-    //    DisconnectServer();
-    //}
-    //public void SendMessage(string msg)
-    //{
 
-    //}
-
-    //public void Recv(object sender, MessageEventArgs e)
-    //{
-
-    //}
-
-    //public void DisconnectServer()
-    //{
-    //    try
-    //    {
-    //        if (_webSocket == null)
-    //            return;
-    //        if (_webSocket.IsAlive)
-    //            _webSocket.Close();
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        Debug.Log(e.ToString());
-    //    }
-    //}
-
-    //public void CreateRoom()
-    //{
-    //}
-
-    public void Sample()
+    #region GameRoom
+    IEnumerator API_RoomCreate()
     {
-        using (var ws = new WebSocket("ws://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/ws-gameplay/websocket/api/games/start/"+_username))
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games/start/"+_username;
+        WWWForm form = new WWWForm();
+        using (UnityWebRequest request = UnityWebRequest.Post(url, form))
         {
-            ws.OnMessage += ws_OnMessage;
-            ws.OnOpen += ws_OnOpen;
-            ws.OnError += ws_OnError;
-            ws.Connect();
-            Thread.Sleep(1000);
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", "Bearer "+_accessToken);
 
-            StompMessageSerializer serializer = new StompMessageSerializer();
+            yield return request.SendWebRequest();
 
-            //var connect = new StompMessage("CONNECT");
-            //connect["accept-version"] = "1.2";
-            //connect["host"] = "";
-            //ws.Send(serializer.Serialize(connect)); 
-
-            var broad = new StompMessage("SEND");
-            broad["Authorization"] = "Bearer "+_accessToken;
-            ws.Send(serializer.Serialize(broad));
-
-            Console.ReadKey(true);
-
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.LogError(request.error);
+                Debug.LogError(request.downloadHandler.text);
+            }
+            else
+            {
+                GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(request.downloadHandler.text);
+                Debug.Log(res.id); Debug.Log(res.statusCode); Debug.Log(res.firstUsername); Debug.Log(res.secondUsername); Debug.Log(res.status);
+                ConnectSocket(res.id);
+                SceneManager.LoadScene("SampleScene");
+            }
         }
+    }
+    IEnumerator API_RoomJoin()
+    {
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games/connect/random/" + _username;
+        WWWForm form = new WWWForm();
+        using (UnityWebRequest request = UnityWebRequest.Post(url, form))
+        {
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", "Bearer " + _accessToken);
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.LogError(request.error);
+                Debug.LogError(request.downloadHandler.text);
+            }
+            else
+            {
+                GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(request.downloadHandler.text);
+                Debug.Log(res.id); Debug.Log(res.statusCode); Debug.Log(res.firstUsername); Debug.Log(res.secondUsername); Debug.Log(res.status);
+                ConnectSocket(res.id);
+                SceneManager.LoadScene("SampleScene");
+            }
+        }
+    }
+    #endregion
+
+    public void CreateRoom()
+    {
+        StartCoroutine(API_RoomCreate());
+    }
+    public void JoinRoom()
+    {
+        StartCoroutine(API_RoomJoin());
+    }
+
+    public void ConnectSocket(int id)
+    {
+        var ws = new WebSocket("ws://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/ws-gameplay/websocket");
+        ws.OnMessage += ws_OnMessage;
+        ws.OnOpen += ws_OnOpen;
+        ws.OnError += ws_OnError;
+        ws.Connect();
+
+        StompMessageSerializer serializer = new StompMessageSerializer();
+        var sub = new StompMessage("SUBSCRIBE");
+        sub["id"] = id.ToString();
+        sub["destination"] = "/sub/games/"+id.ToString();
+        ws.Send(serializer.Serialize(sub));
+        Console.ReadKey(true);
+
+        var sub2 = new StompMessage("SUBSCRIBE");
+        sub2["destination"] = "/sub/games/" + id.ToString();
+        ws.Send(serializer.Serialize(sub2));
+        Console.ReadKey(true);
     }
 
     private void ws_OnOpen(object sender, EventArgs e)
@@ -276,5 +290,14 @@ public class UserLoginResponse
     public string message;
     public string accessToken;
     public string refreshToken;
+}
+[System.Serializable]
+public class GameRoomResponse
+{
+    public int statusCode;
+    public int id;
+    public string firstUsername;
+    public string secondUsername;
+    public string status;
 }
 #endregion
