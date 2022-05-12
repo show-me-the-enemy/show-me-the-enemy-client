@@ -12,6 +12,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BlueCoin
       objectReference: {fileID: 0}
+    - target: {fileID: 3239174578025032606, guid: 81256f85bd6fc0248ac9f47c3cf504ef,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: da38d234677c538448fe4a8a4be048e9, type: 2}
     - target: {fileID: 3239174578025032607, guid: 81256f85bd6fc0248ac9f47c3cf504ef,
         type: 3}
       propertyPath: m_RootOrder

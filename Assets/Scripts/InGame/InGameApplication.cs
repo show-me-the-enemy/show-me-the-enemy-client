@@ -16,7 +16,7 @@ public class InGameApplication : BaseApplication
     public TileScroller tileScroller;
     public MobGenerator mobGenerator;
     public CoinGenerator coinGenerator;
-
+    public WeaponManager weaponManager;
     public List<Monster> monsters = new List<Monster>();
 
     public InGameModel Model

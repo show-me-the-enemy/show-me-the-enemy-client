@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class InGameController : BaseElement, BaseElement.IBaseController
 {
@@ -24,6 +25,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     {
         yield return new WaitForSeconds(1f);
         overPanel.SetActive(true);
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("LobbyScene");
     }
     #endregion
 
@@ -154,6 +157,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _controller._app.tileScroller.Init();
             _controller._app.mobGenerator.Init();
             _controller._app.coinGenerator.Init();
+            _controller._app.weaponManager.Init();
             foreach (Monster mob in _controller._app.monsters)
             {
                 if(mob != null )

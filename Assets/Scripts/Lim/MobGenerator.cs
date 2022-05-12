@@ -7,7 +7,6 @@ public class MobGenerator : MonoBehaviour
     public Transform player;
     public InGameApplication gameApp;
     public float genDelaySec = 3.0f;
-    int mobIdx = 0;
     Dictionary<string, Monster> mobPrefabs = new Dictionary<string, Monster>();
 
     float borderHalfWidth = 29.0f;
@@ -40,15 +39,17 @@ public class MobGenerator : MonoBehaviour
             //mob.speed = 5;
             mob.Init();
             mob.transform.parent = gameObject.transform;
-            gameApp.monsters[mobIdx++] =mob;
+            gameApp.monsters.Add(mob);
             genDelaySec -= 0.01f;
             yield return new WaitForSeconds(genDelaySec);
         }
     }
     public Vector2 getRandomPosition() {
+        float px = player.position.x;
         float y = Random.Range(-borderHalfHeight, borderHalfHeight);
         float x = Random.Range(borderHalfWidth, borderHalfWidth + distRange);
         if (Random.value < 0.5f) x = -x;
+        x += px;
         return new Vector2(x, y);
     }
     public void Set()

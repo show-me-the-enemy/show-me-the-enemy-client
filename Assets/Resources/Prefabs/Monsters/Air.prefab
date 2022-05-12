@@ -130,7 +130,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 428206335
-  m_SortingLayer: 4
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f633c27c122797143bf4782f5c45d885, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -201,8 +201,10 @@ MonoBehaviour:
   animator: {fileID: 8266015809257897643}
   immotalTime: 0.1
   attackable: 1
-  attackTime: 0.03
+  attackTime: 0.1
   damage: 10
+  coinGenerator: {fileID: 0}
+  coinAmount: 100
 --- !u!70 &2205822607861312635
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

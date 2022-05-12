@@ -53,12 +53,14 @@ public class Monster : MonoBehaviour
     {
         if (isImmotal) return;
         animator.SetTrigger("Damaged");
-        StartCoroutine(SetImmotal());
         hp -= d;
         if (hp < 0) Death();
+        else StartCoroutine(SetImmotal());
     }
     void Death()
     {
+        isImmotal = true;
+        attackable = false;
         coinGenerator.genCoin(transform.position, coinAmount);
         hp = -1;
         rb.velocity = Vector2.zero;

@@ -8,23 +8,26 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
     private Rigidbody2D rb;
     public float speed;
-    public GameObject whipFire;
     public Transform fireRoot;
-    public float whipDelaySec = 1.0f;
     public UiBarView hpBar;
     public float maxHp = 100f;
     private float hp;
     public int coinAmout = 0;
     public HudController hudController;
 
+    public WeaponManager weaponManager;
+    private List<IWeapon> weaphons = new List<IWeapon>();
+
     private bool isImmotal = false;
     public float immotalTime = 0.1f;
 
-    Vector2 fireOffset = new Vector3(2.85f, -0.293f, 0);
+    
 
 
     public void Init()
     {
+        weaphons.Add(weaponManager.GetWeapon("whip"));
+        weaphons.Add(weaponManager.GetWeapon("dagger"));
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -51,25 +54,14 @@ public class PlayerController : MonoBehaviour
         transform.localScale = new Vector3((ls3.x) * ((ls3.x * rb.velocity.x < 0) ? -1 : 1), ls3.y, ls3.z);
         float mag_vel = rb.velocity.magnitude;
         animator.SetFloat("MagVel", mag_vel);
-    }
 
-    IEnumerator WhipRoutine()
-    {
-        yield return new WaitForSeconds(whipDelaySec);
-        while (true) 
+        foreach(IWeapon w in weaphons)
         {
-            animator.SetTrigger("Attack");
-            yield return new WaitForSeconds(whipDelaySec);
+            string action = w.AtUpdate(dt_sec);
+            if (action.Length>0)
+                animator.SetTrigger(action);
+            
         }
-    }
-    public void WhipFire()
-    {
-        Vector3 firePos = new Vector3(transform.position.x + transform.localScale.x * fireOffset.x,
-            transform.position.y + fireOffset.y, transform.position.z);
-
-        GameObject whip = Instantiate(whipFire, firePos, Quaternion.identity);
-        whip.transform.parent = fireRoot;
-        whip.GetComponent<SpriteRenderer>().flipX = (transform.localScale.x < 0);
     }
     public void GetDamaged(float d)
     {
@@ -88,6 +80,12 @@ public class PlayerController : MonoBehaviour
         animator.SetTrigger("Death");
         _game.GameOver();
     }
+    public Vector2 GetDirection()
+    {
+        if (rb.velocity.magnitude < 0.1)
+            return Vector2.right * transform.localScale.x;
+        return rb.velocity.normalized;
+    }
     public void DeathEvent()
     {
         animator.enabled=false;
@@ -100,7 +98,6 @@ public class PlayerController : MonoBehaviour
     }
     public void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log(col);
         if (col.tag == "Coin")
         {
             Coin c = col.GetComponent<Coin>();
@@ -115,7 +112,6 @@ public class PlayerController : MonoBehaviour
         animator.enabled = true;
         hp = maxHp;
         hpBar.setValue(1);
-        StartCoroutine(WhipRoutine());
     }
     public void Dispose()
     {

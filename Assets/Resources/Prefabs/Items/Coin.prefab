@@ -50,7 +50,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 3216d0639c0c48946ace1611c27381c8, type: 3}
   - {fileID: 21300000, guid: e51331a95da8f4c4f93a1172063345fb, type: 3}
   sr: {fileID: 3239174578025032606}
-  amout: 100
+  amount: 100
 --- !u!212 &3239174578025032606
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -69,7 +69,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: da38d234677c538448fe4a8a4be048e9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
