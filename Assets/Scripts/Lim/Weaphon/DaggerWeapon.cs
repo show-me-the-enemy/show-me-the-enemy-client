@@ -22,7 +22,6 @@ public class DaggerWeapon : IWeapon
         Vector3 firePos = new Vector3(pp.x,pp.y, 0);
         float angle = Mathf.Atan2(pd.y,pd.x)*Mathf.Rad2Deg;
 
-        Debug.Log(angle);
         Fire d = Instantiate(daggerFire, firePos, Quaternion.identity).GetComponent<Fire>();
         Rigidbody2D frb = d.GetComponent<Rigidbody2D>();
         d.passCapacity = 1;
