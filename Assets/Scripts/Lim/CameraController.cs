@@ -12,8 +12,12 @@ public class CameraController : MonoBehaviour
     public void Init()
     {
         float wph = Screen.width / Screen.height;
-        GetComponent<PixelPerfectCamera>().refResolutionX = Screen.width / 2;
-        GetComponent<PixelPerfectCamera>().refResolutionY = Screen.height / 2;
+        int halfX = Screen.width / 2;
+        int halfY = Screen.height / 2;
+        if (halfX % 2 == 1) halfX++;
+        if (halfY % 2 == 1) halfY++;
+        GetComponent<PixelPerfectCamera>().refResolutionX = halfX;
+        GetComponent<PixelPerfectCamera>().refResolutionY = halfY;
     }
 
     public void AdvanceTime(float dt_sec)
