@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class MobGenerator : MonoBehaviour
 {
@@ -33,7 +34,8 @@ public class MobGenerator : MonoBehaviour
     {
         while (true)
         {
-            Monster mob = Instantiate(mobPrefabs["Air"], getRandomPosition(), Quaternion.identity);
+            // 임시
+            Monster mob = Instantiate(mobPrefabs.Values.ElementAt(Random.RandomRange(0, 3)), getRandomPosition(), Quaternion.identity);
             mob.player = player;
             mob.coinGenerator = gameApp.coinGenerator;
             //mob.speed = 5;

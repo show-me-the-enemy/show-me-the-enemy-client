@@ -34,6 +34,8 @@ public class Monster : MonoBehaviour
         float dist = dir.magnitude;
         dir /= dist; //mag
         dir *= speed;
+        Vector3 ls3 = transform.localScale;
+        transform.localScale = new Vector3((ls3.x) * ((ls3.x * rb.velocity.x < 0) ? 1 : -1), ls3.y, ls3.z);
         if (dist < 0.7f) rb.velocity = Vector2.zero;
         else rb.velocity = dir;
     }
