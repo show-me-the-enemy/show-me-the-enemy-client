@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.U2D;
+
 
 public class CameraController : MonoBehaviour
 {
@@ -9,6 +11,9 @@ public class CameraController : MonoBehaviour
 
     public void Init()
     {
+        float wph = Screen.width / Screen.height;
+        GetComponent<PixelPerfectCamera>().refResolutionX = Screen.width / 2;
+        GetComponent<PixelPerfectCamera>().refResolutionY = Screen.height / 2;
     }
 
     public void AdvanceTime(float dt_sec)
