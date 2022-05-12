@@ -17,6 +17,8 @@ public class Monster : MonoBehaviour
     public float damage = 10f;
 
     private Rigidbody2D rb;
+    public CoinGenerator coinGenerator;
+    public int coinAmount = 100;
 
     // Start is called before the first frame update
     public void Init()
@@ -57,6 +59,7 @@ public class Monster : MonoBehaviour
     }
     void Death()
     {
+        coinGenerator.genCoin(transform.position, coinAmount);
         hp = -1;
         rb.velocity = Vector2.zero;
         animator.SetTrigger("Death");

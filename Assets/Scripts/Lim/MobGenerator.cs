@@ -8,7 +8,7 @@ public class MobGenerator : MonoBehaviour
     public InGameApplication gameApp;
     public float genDelaySec = 3.0f;
     int mobIdx = 0;
-    public Monster[] MobPrefabs;
+    Dictionary<string, Monster> mobPrefabs = new Dictionary<string, Monster>();
 
     float borderHalfWidth = 29.0f;
     float distRange = 20.0f;
@@ -18,6 +18,9 @@ public class MobGenerator : MonoBehaviour
     // Start is called before the first frame update
     public void Init()
     {
+        mobPrefabs.Add("Air", Resources.Load<Monster>("Prefabs/Monsters/Air"));
+        mobPrefabs.Add("Bat", Resources.Load<Monster>("Prefabs/Monsters/Bat"));
+        mobPrefabs.Add("BatSmall", Resources.Load<Monster>("Prefabs/Monsters/BatSmall"));
         Set();
     }
 
@@ -31,8 +34,9 @@ public class MobGenerator : MonoBehaviour
     {
         while (true)
         {
-            Monster mob = Instantiate(MobPrefabs[0], getRandomPosition(), Quaternion.identity);
+            Monster mob = Instantiate(mobPrefabs["Air"], getRandomPosition(), Quaternion.identity);
             mob.player = player;
+            mob.coinGenerator = gameApp.coinGenerator;
             //mob.speed = 5;
             mob.Init();
             mob.transform.parent = gameObject.transform;

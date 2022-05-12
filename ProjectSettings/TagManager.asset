@@ -52,9 +52,6 @@ TagManager:
   - name: Wall
     uniqueID: 407463195
     locked: 0
-  - name: Object
-    uniqueID: 2943613177
-    locked: 0
   - name: Monster
     uniqueID: 428206335
     locked: 0
@@ -63,6 +60,9 @@ TagManager:
     locked: 0
   - name: Fire
     uniqueID: 1682299601
+    locked: 0
+  - name: Object
+    uniqueID: 2943613177
     locked: 0
   - name: UI
     uniqueID: 520072507

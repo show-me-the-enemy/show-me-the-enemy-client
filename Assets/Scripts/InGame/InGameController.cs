@@ -22,7 +22,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     }
     IEnumerator PopOverRoutine()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         overPanel.SetActive(true);
     }
     #endregion
@@ -153,12 +153,12 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _controller._app.cameraController.Init();
             _controller._app.tileScroller.Init();
             _controller._app.mobGenerator.Init();
+            _controller._app.coinGenerator.Init();
             foreach (Monster mob in _controller._app.monsters)
             {
                 if(mob != null )
                     mob.Init(); 
             }
-
         }
 
         public void Set()

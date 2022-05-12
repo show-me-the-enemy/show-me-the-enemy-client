@@ -14,7 +14,8 @@ public class PlayerController : MonoBehaviour
     public UiBarView hpBar;
     public float maxHp = 100f;
     private float hp;
-
+    public int coinAmout = 0;
+    public HudController hudController;
 
     private bool isImmotal = false;
     public float immotalTime = 0.1f;
@@ -96,6 +97,16 @@ public class PlayerController : MonoBehaviour
         isImmotal = true;
         yield return new WaitForSeconds(immotalTime);
         isImmotal = false;
+    }
+    public void OnTriggerEnter2D(Collider2D col)
+    {
+        Debug.Log(col);
+        if (col.tag == "Coin")
+        {
+            Coin c = col.GetComponent<Coin>();
+            coinAmout += c.GetCoin();
+            hudController.UpdateCoinText(coinAmout);
+        }
     }
 
 
