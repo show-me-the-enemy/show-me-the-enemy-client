@@ -230,22 +230,24 @@ public class NetworkManager : MonoBehaviour
         ws.Connect();
 
         StompMessageSerializer serializer = new StompMessageSerializer();
+
+        var connect = new StompMessage("CONNECT");
+        connect["accept-version"] = "1.2";
+        connect["host"] = "";
+        ws.Send(serializer.Serialize(connect));
+
+        Debug.LogError(id);
+
         var sub = new StompMessage("SUBSCRIBE");
-        sub["id"] = id.ToString();
+        sub["id"] = "sub-" + id.ToString();
         sub["destination"] = "/sub/games/"+id.ToString();
         ws.Send(serializer.Serialize(sub));
-        Console.ReadKey(true);
-
-        var sub2 = new StompMessage("SUBSCRIBE");
-        sub2["destination"] = "/sub/games/" + id.ToString();
-        ws.Send(serializer.Serialize(sub2));
         Console.ReadKey(true);
     }
 
     private void ws_OnOpen(object sender, EventArgs e)
     {
         Debug.Log(DateTime.Now.ToString() + " ws_OnOpen says: " + e.ToString());
-        
     }
 
     private void ws_OnMessage(object sender, MessageEventArgs e)
