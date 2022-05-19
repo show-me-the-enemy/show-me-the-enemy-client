@@ -317,10 +317,10 @@ public class NetworkManager : MonoBehaviour
                     InGameBuildUpResponse res = JsonUtility.FromJson<InGameBuildUpResponse>(msg.Body);
                 }
                 
-                foreach(var h in msg.Headers.Keys)
-                {
-                    Debug.Log("Key : " + h + ", Value : " + msg.Headers[h]);
-                }
+                //foreach(var h in msg.Headers.Keys)
+                //{
+                //    Debug.Log("Key : " + h + ", Value : " + msg.Headers[h]);
+                //}
                 Debug.Log(msg.Body);
                 break;
             default:
