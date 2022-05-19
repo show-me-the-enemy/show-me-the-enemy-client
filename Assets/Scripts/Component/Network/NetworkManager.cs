@@ -257,6 +257,7 @@ public class NetworkManager : MonoBehaviour
     }
     #endregion
 
+    #region WebSocket
     private WebSocket ws;
     private bool _isGameReady = false;
     private int _currentRoomId;
@@ -306,12 +307,21 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log(msg.Body);
                 break;
             case "MESSAGE":
-                _isGameReady = true;
-                //GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(msg.Body);
-                //if (res != null)
+                if(msg.Headers["game-status"] =="start" || msg.Headers["game-status"] == "finish")
                 {
-                    Debug.Log(msg.Body);
+                    _isGameReady = true;
+                    InGameStatusResponse res = JsonUtility.FromJson<InGameStatusResponse>(msg.Body);
                 }
+                else
+                {
+                    InGameBuildUpResponse res = JsonUtility.FromJson<InGameBuildUpResponse>(msg.Body);
+                }
+                
+                foreach(var h in msg.Headers.Keys)
+                {
+                    Debug.Log("Key : " + h + ", Value : " + msg.Headers[h]);
+                }
+                Debug.Log(msg.Body);
                 break;
             default:
                 Debug.LogError("msg.Command 설정하시오");
@@ -324,11 +334,17 @@ public class NetworkManager : MonoBehaviour
     {
         Debug.Log(DateTime.Now.ToString() + " ws_OnError says: " + e.Message);
     }
-    public class Content
+
+    public void SendBuildUpMsg(int nMonsters, int nItem)
     {
-        public string Subject { get; set; }
-        public string Message { get; set; }
+        StompMessageSerializer serializer = new StompMessageSerializer();
+        var request = new InGameBuildUpRequest() { id = _currentRoomId, sender = _username,numMonsters = nMonsters,numItem= nItem };
+        var broad = new StompMessage("SEND", JsonUtility.ToJson(request));
+        broad["content-type"] = "application/json";
+        broad["destination"] = "/pub/build-up";
+        ws.Send(serializer.Serialize(broad));
     }
+    #endregion
 }
 
 
@@ -348,6 +364,14 @@ public class UserSignUpRequest
     public string password;
     public string matchingPassword;
 }
+[System.Serializable]
+public class InGameBuildUpRequest
+{
+    public int id;
+    public string sender;
+    public int numMonsters;
+    public int numItem;
+}
 #endregion
 
 #region network Response class
@@ -361,6 +385,23 @@ public class UserLoginResponse
 }
 [System.Serializable]
 public class GameRoomResponse
+{
+    public int statusCode;
+    public int id;
+    public string firstUsername;
+    public string secondUsername;
+    public string status;
+}
+[System.Serializable]
+public class InGameBuildUpResponse
+{
+    public string sender;
+    public string status;
+    public int numMonsters;
+    public int numItem;
+}
+[System.Serializable]
+public class InGameStatusResponse
 {
     public int statusCode;
     public int id;
