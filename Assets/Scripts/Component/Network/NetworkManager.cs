@@ -38,7 +38,7 @@ public class NetworkManager : MonoBehaviour
     }
     #endregion
 
-    #region context
+    #region API context
     private string _username;
     public string UserName
     {
@@ -90,6 +90,11 @@ public class NetworkManager : MonoBehaviour
         StartCoroutine(API_RoomJoin());
     }
 
+    public void PlayerDie()
+    {
+        StartCoroutine(API_PlayerDie());
+    }
+
     public void OnNotification(Notification noti)
     {
         if(noti.data[EDataParamKey.UserLoginRequest]!=null)
@@ -107,7 +112,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    #region Login Register
+    #region Login Register API
     IEnumerator API_SignUp(UserSignUpRequest userRequest)
     {
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/auth/register";
@@ -167,7 +172,7 @@ public class NetworkManager : MonoBehaviour
     }
     #endregion
 
-    #region GameRoom
+    #region GameRoom API
     IEnumerator API_RoomCreate()
     {
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games/start/"+_username;
@@ -189,7 +194,9 @@ public class NetworkManager : MonoBehaviour
                 GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(request.downloadHandler.text);
                 string json = JsonUtility.ToJson(res);
                 Debug.Log(json);
-                ConnectSocket(res.id);
+                _isGameReady = false;
+                _currentRoomId = res.id;
+                ConnectSocket();
                 SceneManager.LoadScene("SampleScene");
             }
         }
@@ -214,16 +221,55 @@ public class NetworkManager : MonoBehaviour
             {
                 GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(request.downloadHandler.text);
                 Debug.Log(res.id); Debug.Log(res.statusCode); Debug.Log(res.firstUsername); Debug.Log(res.secondUsername); Debug.Log(res.status);
-                ConnectSocket(res.id);
+                _isGameReady = true;
+                _currentRoomId = res.id;
+                ConnectSocket();
                 SceneManager.LoadScene("SampleScene");
             }
         }
     }
     #endregion
 
-    private void ConnectSocket(int id)
+    #region GamePlay API
+    IEnumerator API_PlayerDie()
     {
-        var ws = new WebSocket("ws://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/ws-gameplay/websocket");
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games/" + _currentRoomId;
+        byte[] myData = System.Text.Encoding.UTF8.GetBytes("This is some test data");
+        using (UnityWebRequest request = UnityWebRequest.Put(url, myData))
+        {
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", "Bearer " + _accessToken);
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.LogError(request.error);
+                Debug.LogError(request.downloadHandler.text);
+            }
+            else
+            {
+                GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(request.downloadHandler.text);
+                string json = JsonUtility.ToJson(res);
+                Debug.Log(json);
+            }
+        }
+    }
+    #endregion
+
+    private WebSocket ws;
+    private bool _isGameReady = false;
+    private int _currentRoomId;
+    public bool IsGameReady
+    {
+        get
+        {
+            return _isGameReady;
+        }
+    }
+    private void ConnectSocket()
+    {
+        ws = new WebSocket("ws://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/ws-gameplay/websocket");
         ws.OnMessage += ws_OnMessage;
         ws.OnOpen += ws_OnOpen;
         ws.OnError += ws_OnError;
@@ -236,11 +282,9 @@ public class NetworkManager : MonoBehaviour
         connect["host"] = "";
         ws.Send(serializer.Serialize(connect));
 
-        Debug.LogError(id);
-
         var sub = new StompMessage("SUBSCRIBE");
-        sub["id"] = "sub-" + id.ToString();
-        sub["destination"] = "/sub/games/"+id.ToString();
+        sub["id"] = "sub-" + _currentRoomId.ToString();
+        sub["destination"] = "/sub/games/"+ _currentRoomId.ToString();
         ws.Send(serializer.Serialize(sub));
         Console.ReadKey(true);
     }
@@ -253,13 +297,37 @@ public class NetworkManager : MonoBehaviour
     private void ws_OnMessage(object sender, MessageEventArgs e)
     {
         Debug.Log("-----------------------------");
-        Debug.Log(DateTime.Now.ToString() + " ws_OnMessage says: " + e.Data);
+        StompMessageSerializer serializer = new StompMessageSerializer();
+
+        var msg = serializer.Deserialize(e.Data);
+        switch (msg.Command)
+        {
+            case "CONNECTED":
+                Debug.Log(msg.Body);
+                break;
+            case "MESSAGE":
+                _isGameReady = true;
+                //GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(msg.Body);
+                //if (res != null)
+                {
+                    Debug.Log(msg.Body);
+                }
+                break;
+            default:
+                Debug.LogError("msg.Command 설정하시오");
+                break;
+        }
 
     }
 
     private void ws_OnError(object sender, ErrorEventArgs e)
     {
         Debug.Log(DateTime.Now.ToString() + " ws_OnError says: " + e.Message);
+    }
+    public class Content
+    {
+        public string Subject { get; set; }
+        public string Message { get; set; }
     }
 }
 

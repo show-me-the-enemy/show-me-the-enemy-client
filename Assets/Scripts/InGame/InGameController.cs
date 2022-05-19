@@ -36,7 +36,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         overPanel.SetActive(false);
         buildupPanel.SetActive(false);
         InitHandlers();
-        ChangeState(EInGameState.BATTLE);
+        ChangeState(EInGameState.LOADING);
     }
 
     public void Set()
@@ -117,7 +117,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     #region State Handler Class
     protected class StateHandlerLoading : IInGameStateHandler
     {
-        private bool _isConnectReady = false;
         private InGameController _controller;
         public void Init(InGameController controller)
         {
@@ -132,7 +131,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void AdvanceTime(float dt_sec)
         {
-            if(_isConnectReady /*&&상대방 준비완료*/)
+            if(NetworkManager.Instance.IsGameReady)
             {
                 _controller.ChangeState(EInGameState.BATTLE); //배틀 스테이지로 넘어감
             }
