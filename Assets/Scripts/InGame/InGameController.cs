@@ -126,6 +126,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
+            _controller._app.View.LoadingPopup.SetActive(true);
             //내가 준비되면 상대방에게도 신호보냄
         }
 
@@ -139,6 +140,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Dispose()
         {
+            _controller._app.View.LoadingPopup.SetActive(false);
         }
 
     }
