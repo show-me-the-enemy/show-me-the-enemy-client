@@ -176,6 +176,10 @@ public enum ENotiMessage
     //8000 ~ 9999 Network 관련
     NetworkRequestLogin = 8000,
     NetworkRequestSignUp,
+
+    //Response 관련
+    InGameStatusResponse,
+    InGameBuildUpResponse,
 }
 
 public enum EDataParamKey
@@ -185,4 +189,7 @@ public enum EDataParamKey
     UserLoginRequest, //UserLogin class 보낼때
     UserSignUpRequest, //UserSignUp class 보낼때
 
+    //Response 관련
+    InGameStatusResponse,
+    InGameBuildUpResponse,
 }

@@ -297,7 +297,7 @@ public class NetworkManager : MonoBehaviour
 
     private void ws_OnMessage(object sender, MessageEventArgs e)
     {
-        Debug.Log("-----------------------------");
+        //Debug.Log("-----------------------------");
         StompMessageSerializer serializer = new StompMessageSerializer();
 
         var msg = serializer.Deserialize(e.Data);
@@ -311,17 +311,23 @@ public class NetworkManager : MonoBehaviour
                 {
                     _isGameReady = true;
                     InGameStatusResponse res = JsonUtility.FromJson<InGameStatusResponse>(msg.Body);
+                    Hashtable sendData = new Hashtable();
+                    sendData.Add(EDataParamKey.InGameStatusResponse, res);
+                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameStatusResponse, sendData);
                 }
                 else
                 {
                     InGameBuildUpResponse res = JsonUtility.FromJson<InGameBuildUpResponse>(msg.Body);
+                    Hashtable sendData = new Hashtable();
+                    sendData.Add(EDataParamKey.InGameBuildUpResponse, res);
+                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameBuildUpResponse, sendData);
                 }
                 
                 //foreach(var h in msg.Headers.Keys)
                 //{
                 //    Debug.Log("Key : " + h + ", Value : " + msg.Headers[h]);
                 //}
-                Debug.Log(msg.Body);
+                //Debug.Log(msg.Body);
                 break;
             default:
                 Debug.LogError("msg.Command 설정하시오");
@@ -343,6 +349,8 @@ public class NetworkManager : MonoBehaviour
         broad["content-type"] = "application/json";
         broad["destination"] = "/pub/build-up";
         ws.Send(serializer.Serialize(broad));
+
+
     }
     #endregion
 }

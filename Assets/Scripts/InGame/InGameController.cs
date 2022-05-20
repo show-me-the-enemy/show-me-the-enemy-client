@@ -37,6 +37,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         buildupPanel.SetActive(false);
         InitHandlers();
         ChangeState(EInGameState.LOADING);
+        NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameStatusResponse);
+        NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
     }
 
     public void Set()
@@ -65,6 +67,31 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
     }
 
+    //이런식으로 받아서 사용하면 됌
+    private void OnNotification(Notification noti)
+    {
+        switch(noti.msg)
+        {
+            case ENotiMessage.InGameBuildUpResponse:
+                
+                InGameBuildUpResponse buildUpRes = (InGameBuildUpResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
+                Debug.Log(buildUpRes);
+                //buildUpRes.numItem
+                //buildUpRes.numMonsters
+                //buildUpRes.sender
+                //buildUpRes.status
+                break;
+            case ENotiMessage.InGameStatusResponse:
+                InGameStatusResponse statusRes = (InGameStatusResponse)noti.data[EDataParamKey.InGameStatusResponse];
+                Debug.Log(statusRes);
+                //statusRes.firstUsername
+                //statusRes.id
+                //statusRes.secondUsername
+                //statusRes.status
+                //statusRes.statusCode
+                break;
+        }
+    }
 
     #region State Handlers Base
     private Dictionary<EInGameState, IInGameStateHandler> _handlers = new Dictionary<EInGameState, IInGameStateHandler>();
