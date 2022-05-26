@@ -71,6 +71,16 @@ public class NetworkManager : MonoBehaviour
             return _refreshToken;
         }
     }
+
+    private bool _isIngameDie = false;
+    public bool isIngameDie
+    {
+        get
+        {
+            return _isIngameDie;
+        }
+    }
+
     #endregion
 
     void Awake()
@@ -83,16 +93,33 @@ public class NetworkManager : MonoBehaviour
 
     public void CreateRoom()
     {
+        _isIngameDie = false;
         StartCoroutine(API_RoomCreate());
     }
     public void JoinRoom()
     {
+        _isIngameDie = false;
         StartCoroutine(API_RoomJoin());
     }
 
     public void PlayerDie()
     {
+        _isIngameDie = true;
         StartCoroutine(API_PlayerDie());
+    }
+
+    public void GameResult(int round)
+    {
+        UserGameResultRequest req = new UserGameResultRequest();
+        req.username = _username;
+        req.gameId = _currentRoomId;
+        req.won = !_isIngameDie;
+        if (req.won)
+            req.crystal = 100;
+        else
+            req.crystal = 50;
+        req.numRound = round;
+        StartCoroutine(API_GameResult(req));
     }
 
     public void OnNotification(Notification noti)
@@ -255,6 +282,38 @@ public class NetworkManager : MonoBehaviour
             }
         }
     }
+    IEnumerator API_GameResult(UserGameResultRequest userRequest)
+    {
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users";
+        string json = JsonUtility.ToJson(userRequest);
+        Debug.LogError("b");
+        using (UnityWebRequest request = UnityWebRequest.Put(url, json))
+        {
+            Debug.LogError("c");
+            byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(json);
+            request.uploadHandler = new UploadHandlerRaw(jsonToSend);
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("Authorization", "Bearer " + _accessToken);
+
+            yield return request.SendWebRequest();
+
+            Debug.LogError("d");
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.LogError(request.error);
+                Debug.LogError(request.downloadHandler.text);
+            }
+            else
+            {
+                Debug.LogError("c");
+                UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
+                string resJson = JsonUtility.ToJson(res);
+                Debug.Log(resJson);
+                //DisconnectSocket();
+            }
+        }
+    }
     #endregion
 
     #region WebSocket
@@ -288,6 +347,28 @@ public class NetworkManager : MonoBehaviour
         sub["destination"] = "/sub/games/"+ _currentRoomId.ToString();
         ws.Send(serializer.Serialize(sub));
         Console.ReadKey(true);
+    }
+
+    public void DisconnectSocket()
+    {
+        try
+        {
+            if (ws == null)
+            {
+                return;
+            }
+            if (ws.IsAlive)
+            {
+                ws.OnMessage -= ws_OnMessage;
+                ws.OnOpen -= ws_OnOpen;
+                ws.OnError -= ws_OnError;
+                ws.Close();
+            }
+        }
+        catch(Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
     }
 
     private void ws_OnOpen(object sender, EventArgs e)
@@ -349,8 +430,6 @@ public class NetworkManager : MonoBehaviour
         broad["content-type"] = "application/json";
         broad["destination"] = "/pub/build-up";
         ws.Send(serializer.Serialize(broad));
-
-
     }
     #endregion
 }
@@ -380,6 +459,17 @@ public class InGameBuildUpRequest
     public int numMonsters;
     public int numItem;
 }
+
+[System.Serializable]
+public class UserGameResultRequest
+{
+    public long gameId;
+    public string username;
+    public int numRound;
+    public int crystal;
+    public bool won;
+}
+
 #endregion
 
 #region network Response class
@@ -416,5 +506,14 @@ public class InGameStatusResponse
     public string firstUsername;
     public string secondUsername;
     public string status;
+}
+[System.Serializable]
+public class UserGameResultResponse
+{
+    public int statusCode;
+    public string username;
+    public int maxRound;
+    public int crystal;
+    public int numWins;
 }
 #endregion
