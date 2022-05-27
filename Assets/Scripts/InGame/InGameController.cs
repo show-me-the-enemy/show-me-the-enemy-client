@@ -19,7 +19,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     public void GameOver()
     {
         StartCoroutine(PopOverRoutine());
-        ChangeState(EInGameState.PAUSE);
     }
     IEnumerator PopOverRoutine()
     {
@@ -39,6 +38,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         ChangeState(EInGameState.LOADING);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameStatusResponse);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
+        NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameFinished);
     }
 
     public void Set()
