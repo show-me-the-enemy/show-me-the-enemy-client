@@ -78,8 +78,8 @@ public class PlayerController : MonoBehaviour
         isImmotal = true;
         rb.velocity = Vector2.zero;
         animator.SetTrigger("Death");
-        NetworkManager.Instance.PlayerDie();
-        _game.GameOver();
+        NotificationCenter.Instance.PostNotification(ENotiMessage.InGameFinished);
+
     }
     public Vector2 GetDirection()
     {

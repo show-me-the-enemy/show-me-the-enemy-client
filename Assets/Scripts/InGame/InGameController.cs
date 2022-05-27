@@ -90,6 +90,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 //statusRes.status
                 //statusRes.statusCode
                 break;
+            case ENotiMessage.InGameFinished:
+                ChangeState(EInGameState.DEATH);
+                break;
         }
     }
 
@@ -293,6 +296,29 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
 
     }
+    protected class StateHandlerDeath : IInGameStateHandler 
+    {
+        InGameController _controller;
+        public void Init(InGameController controller)
+        {
+
+        }
+
+        public void Set()
+        {
+            NetworkManager.Instance.PlayerDie();
+            _controller.GameOver();
+        }
+
+        public void AdvanceTime(float dt_sec)
+        {
+        }
+
+        public void Dispose()
+        {
+        }
+
+    }
     #endregion
 }
 public interface IInGameStateHandler
@@ -310,4 +336,5 @@ public enum EInGameState
     BATTLE,
     UPGRADE,
     PAUSE,
+    DEATH,
 }

@@ -180,6 +180,9 @@ public enum ENotiMessage
     //Response 관련
     InGameStatusResponse,
     InGameBuildUpResponse,
+
+    //ingame관련
+    InGameFinished,
 }
 
 public enum EDataParamKey
