@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 
-public class TileScroller : BaseApplication
+public class TileScroller : BaseElement, BaseElement.IBaseController
 {
     [field: SerializeField] private float Choke { get; set; } = 16f;
 
@@ -60,7 +60,7 @@ public class TileScroller : BaseApplication
         }
     }
 
-    public override void Init()
+    public void Init()
     {
         Camera mainCamera = Camera.main;
         _cameraTransform = mainCamera.transform;
@@ -79,7 +79,7 @@ public class TileScroller : BaseApplication
         bufferTop = tileSize.position.y;
         bufferDown = tileSize.position.y + tileSize.size.y;
     }
-    public override void AdvanceTime(float dt_sec)
+    public void AdvanceTime(float dt_sec)
     {
         Vector3 dtPos = _cameraTransform.position - _lastCameraPosition;
         if (dtPos.x == 0)
@@ -96,10 +96,15 @@ public class TileScroller : BaseApplication
 
         _lastCameraPosition = _cameraTransform.position;
     }
-    override public void Set()
+    public void Set()
     {
     }
-    override public void Dispose()
+    public void Dispose()
     {
+    }
+
+    public void SetActive(bool flag)
+    {
+        throw new System.NotImplementedException();
     }
 }

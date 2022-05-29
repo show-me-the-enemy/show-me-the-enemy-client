@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : BaseApplication
+public class PlayerController : BaseElement, BaseElement.IBaseController
 {
     public InGameController _game;
     public Animator animator;
@@ -66,15 +66,14 @@ public class PlayerController : BaseApplication
     }
 
 
-    public override void Init()
+    public void Init()
     {
         weaphons.Add(weaponManager.GetWeapon("whip"));
         weaphons.Add(weaponManager.GetWeapon("dagger"));
         rb = GetComponent<Rigidbody2D>();
     }
-    public override void AdvanceTime(float dt_sec)
+    public void AdvanceTime(float dt_sec)
     {
-        Debug.Log(":");
         if (hp < 0) return;
         rb.velocity = new Vector2(0, 0);
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
@@ -105,16 +104,21 @@ public class PlayerController : BaseApplication
 
         }
     }
-    public override void Set()
+    public void Set()
     {
         animator.enabled = true;
         hp = maxHp;
         hpBar.setValue(1);
     }
-    public override void Dispose()
+    public void Dispose()
     {
         animator.enabled = false;
         rb.velocity = Vector2.zero; 
         StopCoroutine(SetImmotal());
+    }
+
+    public void SetActive(bool flag)
+    {
+        throw new System.NotImplementedException();
     }
 }

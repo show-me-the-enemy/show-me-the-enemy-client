@@ -11,7 +11,7 @@ public class InGameApplication : BaseApplication
     [SerializeField]
     private InGameController _controller;
 
-    public List<BaseApplication> contollers;
+    public List<BaseElement> contollers;
     public List<Monster> monsters = new List<Monster>();
 
     public InGameModel Model
@@ -30,8 +30,6 @@ public class InGameApplication : BaseApplication
 
     public override void Init()
     {
-        Debug.Log("app");
-        Debug.Log(_controller);
         _controller.Init();
     }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Monster : BaseApplication
+public class Monster : BaseElement, BaseElement.IBaseController
 {
     public Transform player;
     public float speed = 5;
@@ -71,13 +71,13 @@ public class Monster : BaseApplication
     }
 
 
-    public override void Init()
+    public void Init()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
     }
     // Update is called once per frame
-    public override void AdvanceTime(float dt_sec)
+    public void AdvanceTime(float dt_sec)
     {
         if (hp < 0) return;
         Vector2 dir = (player.position - transform.position);
@@ -89,13 +89,18 @@ public class Monster : BaseApplication
         if (dist < 0.7f) rb.velocity = Vector2.zero;
         else rb.velocity = dir;
     }
-    public override void Set()
+    public void Set()
     {
         animator.SetBool("Walk", true);
     }
-    public override void Dispose()
+    public void Dispose()
     {
         rb.velocity = Vector2.zero;
         animator.SetTrigger("Death");
+    }
+
+    public void SetActive(bool flag)
+    {
+        throw new System.NotImplementedException();
     }
 }

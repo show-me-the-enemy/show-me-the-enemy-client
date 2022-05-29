@@ -724,7 +724,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 362337205}
   gameApp: {fileID: 722803108}
-  genDelaySec: 1
+  coinGenerator: {fileID: 1492522673}
+  genDelaySec: 0.1
 --- !u!1 &190464137
 GameObject:
   m_ObjectHideFlags: 0
@@ -39990,113 +39991,12 @@ MonoBehaviour:
   _model: {fileID: 1716633483}
   _view: {fileID: 1312655265}
   _controller: {fileID: 1190568656}
-  cameraController: {fileID: 519420033}
-  playerController: {fileID: 362337206}
-  tileScroller: {fileID: 629481791}
-  mobGenerator: {fileID: 181529493}
-  coinGenerator: {fileID: 1492522673}
-  weaponManager: {fileID: 1329348537}
-  monsters:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  contollers:
+  - {fileID: 519420033}
+  - {fileID: 362337206}
+  - {fileID: 181529493}
+  - {fileID: 629481791}
+  monsters: []
 --- !u!4 &722803109
 Transform:
   m_ObjectHideFlags: 0
@@ -41320,8 +41220,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overPanel: {fileID: 126341741}
   buildupPanel: {fileID: 1292861281}
-  roundLength: 30
-  buildupLength: 10
+  roundLength: 10
+  buildupLength: 5
   topBar: {fileID: 1299200242}
 --- !u!4 &1190568657
 Transform:

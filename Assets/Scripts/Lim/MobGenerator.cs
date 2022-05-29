@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class MobGenerator : BaseApplication
+public class MobGenerator : BaseElement, BaseElement.IBaseController
 {
     public Transform player;
     public InGameApplication gameApp;
     public CoinGenerator coinGenerator;
     Dictionary<string, Monster> mobPrefabs = new Dictionary<string, Monster>();
-    public float genDelaySec = 3.0f;
+    public float genDelaySec = 0.1f;
     private float progTime = 0f;
     private int genMobCount = -1;
 
@@ -28,7 +28,6 @@ public class MobGenerator : BaseApplication
         mob.Init();
         mob.transform.parent = gameObject.transform;
         gameApp.monsters.Add(mob);
-        genDelaySec -= 0.01f;
     }
     public Vector2 getRandomPosition() {
         float px = player.position.x;
@@ -39,14 +38,14 @@ public class MobGenerator : BaseApplication
         return new Vector2(x, y);
     }
 
-    public override void Init()
+    public void Init()
     {
         mobPrefabs.Add("Air", Resources.Load<Monster>("Prefabs/Monsters/Air"));
         mobPrefabs.Add("Bat", Resources.Load<Monster>("Prefabs/Monsters/Bat"));
         mobPrefabs.Add("BatSmall", Resources.Load<Monster>("Prefabs/Monsters/BatSmall"));
     }
 
-    public override void AdvanceTime(float dt_sec)
+    public void AdvanceTime(float dt_sec)
     {
         if (genMobCount < 0)
             return;
@@ -55,18 +54,26 @@ public class MobGenerator : BaseApplication
 
         if(genMobCount < curIndex)
         {
+           
             genMobCount++;
             genMonster();
         }
     }
 
-    public override void Set()
+    public void Set()
     {
+        Debug.Log("Regen");
         genMobCount = 0;
+        progTime = 0f;
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         genMobCount = -1;
+    }
+
+    public void SetActive(bool flag)
+    {
+        throw new System.NotImplementedException();
     }
 }

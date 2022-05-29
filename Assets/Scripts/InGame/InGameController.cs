@@ -13,7 +13,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     public GameObject buildupPanel;
     private float roundStartTime;
     public float roundLength = 30;
-    private float buildupStartTime;
     public float buildupLength = 10;
     public UiBarView topBar;
 
@@ -36,8 +35,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         overPanel.SetActive(false);
         buildupPanel.SetActive(false);
         InitHandlers();
-        Debug.Log("ctrl");
-        ChangeState(EInGameState.LOADING);
+        ChangeState(EInGameState.BATTLE);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameStatusResponse);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameFinished);
@@ -109,6 +107,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         _handlers.Add(EInGameState.BATTLE, new StateHandlerBattle());
         _handlers.Add(EInGameState.UPGRADE, new StateHandlerUpgrade());
         _handlers.Add(EInGameState.PAUSE, new StateHandlerPause());
+        _handlers.Add(EInGameState.DEATH, new StateHandlerDeath());
 
         foreach (EInGameState state in _handlers.Keys)
         {
@@ -185,7 +184,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         {
             _controller = controller;
             _currentPlayTime = 0;
-            foreach(BaseApplication ba in _controller._app.contollers)
+            foreach(BaseElement.IBaseController ba in _controller._app.contollers)
             {
                 if (ba != null) ba.Init();
             }
@@ -198,7 +197,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            foreach (BaseApplication ba in _controller._app.contollers)
+            foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
                 if (ba != null) ba.Set();
             }
@@ -213,7 +212,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         {
             _currentPlayTime += dt_sec;
 
-            foreach (BaseApplication ba in _controller._app.contollers)
+            foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
                 if (ba != null) ba.AdvanceTime(dt_sec);
             }
@@ -233,7 +232,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
         public void Dispose()
         {
-            foreach (BaseApplication ba in _controller._app.contollers)
+
+            foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
                 if (ba != null) ba.Dispose();
             }
@@ -264,12 +264,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         public void AdvanceTime(float dt_sec)
         {
             _currentUpgradeTime += dt_sec;
-
-            float prg_t = _currentUpgradeTime - _controller.buildupStartTime;
-            _controller.topBar.setValue(1 - prg_t / _controller.buildupLength);
-            if (prg_t > _controller.buildupLength)
+            
+            _controller.topBar.setValue(1 - _currentUpgradeTime / _controller.buildupLength);
+            if (_currentUpgradeTime > _controller.buildupLength)
             {
-                _controller.buildupStartTime = _currentUpgradeTime;
                 _controller.ChangeState(EInGameState.BATTLE);
             }
         }
@@ -305,12 +303,12 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         InGameController _controller;
         public void Init(InGameController controller)
         {
-
+            _controller = controller;
         }
 
         public void Set()
         {
-            NetworkManager.Instance.PlayerDie();
+            //NetworkManager.Instance.PlayerDie();
             _controller.GameOver();
         }
 

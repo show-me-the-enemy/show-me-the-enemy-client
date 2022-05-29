@@ -66,10 +66,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4872450301004358611}
+  - component: {fileID: 3130791795338939503}
   - component: {fileID: 1903079707659055573}
   - component: {fileID: 8266015809257897643}
   - component: {fileID: 65454206094166161}
-  - component: {fileID: 3130791795338939503}
   - component: {fileID: 2205822607861312635}
   m_Layer: 15
   m_Name: Air
@@ -93,6 +93,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3130791795338939503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7946228898067756607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc8f3a37ab1f9b247beb55b2b4867dea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  speed: 2.4
+  hp: 20
+  animator: {fileID: 8266015809257897643}
+  immotalTime: 0.1
+  attackable: 1
+  attackTime: 0.1
+  damage: 10
+  coinGenerator: {fileID: 0}
+  coinAmount: 100
 --- !u!212 &1903079707659055573
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -183,28 +205,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &3130791795338939503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7946228898067756607}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc8f3a37ab1f9b247beb55b2b4867dea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  speed: 2.4
-  hp: 20
-  animator: {fileID: 8266015809257897643}
-  immotalTime: 0.1
-  attackable: 1
-  attackTime: 0.1
-  damage: 10
-  coinGenerator: {fileID: 0}
-  coinAmount: 100
 --- !u!70 &2205822607861312635
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

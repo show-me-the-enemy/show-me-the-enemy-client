@@ -23,5 +23,6 @@ public class CoinGenerator : MonoBehaviour
         else cName = "gold";
         Coin coin = Instantiate(coinPrefabs[cName], pos, Quaternion.identity);
         coin.amount = amount;
+        coin.transform.parent = transform;
     }
 }
