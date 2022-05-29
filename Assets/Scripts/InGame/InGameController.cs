@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class InGameController : BaseElement, BaseElement.IBaseController
 {
     private InGameApplication _app = new InGameApplication();
+
     #region lim
     public GameObject overPanel;
     public GameObject buildupPanel;
@@ -35,6 +36,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         overPanel.SetActive(false);
         buildupPanel.SetActive(false);
         InitHandlers();
+        Debug.Log("ctrl");
         ChangeState(EInGameState.LOADING);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameStatusResponse);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
@@ -117,6 +119,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
     private void ChangeState(EInGameState nextState)
     {
+        Debug.Log(nextState);
         if (nextState != EInGameState.UNKNOWN && nextState != _currentState)
         {
             EInGameState prevState = _currentState;
@@ -182,13 +185,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         {
             _controller = controller;
             _currentPlayTime = 0;
-
-            _controller._app.playerController.Init();
-            _controller._app.cameraController.Init();
-            _controller._app.tileScroller.Init();
-            _controller._app.mobGenerator.Init();
-            _controller._app.coinGenerator.Init();
-            _controller._app.weaponManager.Init();
+            foreach(BaseApplication ba in _controller._app.contollers)
+            {
+                if (ba != null) ba.Init();
+            }
             foreach (Monster mob in _controller._app.monsters)
             {
                 if(mob != null )
@@ -198,8 +198,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            _controller._app.playerController.Set();
-            _controller._app.mobGenerator.Set();
+            foreach (BaseApplication ba in _controller._app.contollers)
+            {
+                if (ba != null) ba.Set();
+            }
             foreach (Monster mob in _controller._app.monsters)
             {
                 if (mob != null)
@@ -211,10 +213,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         {
             _currentPlayTime += dt_sec;
 
-            _controller._app.playerController.AdvanceTime(dt_sec);
-            _controller._app.cameraController.AdvanceTime(dt_sec);
-            _controller._app.tileScroller.AdvanceTime(dt_sec);
-            _controller._app.mobGenerator.AdvanceTime(dt_sec);
+            foreach (BaseApplication ba in _controller._app.contollers)
+            {
+                if (ba != null) ba.AdvanceTime(dt_sec);
+            }
             foreach (Monster mob in _controller._app.monsters)
             {
                 if(mob!= null )
@@ -231,8 +233,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
         public void Dispose()
         {
-            _controller._app.playerController.Dispose();
-            _controller._app.mobGenerator.Dispose();
+            foreach (BaseApplication ba in _controller._app.contollers)
+            {
+                if (ba != null) ba.Dispose();
+            }
             foreach (Monster mob in _controller._app.monsters)
             {
                 if (mob != null)

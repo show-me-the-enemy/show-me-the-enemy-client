@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Monster : MonoBehaviour
+public class Monster : BaseApplication
 {
     public Transform player;
     public float speed = 5;
@@ -20,25 +20,7 @@ public class Monster : MonoBehaviour
     public CoinGenerator coinGenerator;
     public int coinAmount = 100;
 
-    // Start is called before the first frame update
-    public void Init()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-    }
-    // Update is called once per frame
-    public void AdvanceTime(float dt_sec)
-    {
-        if (hp < 0) return;
-        Vector2 dir = (player.position - transform.position);
-        float dist = dir.magnitude;
-        dir /= dist; //mag
-        dir *= speed;
-        Vector3 ls3 = transform.localScale;
-        transform.localScale = new Vector3((ls3.x) * ((ls3.x * rb.velocity.x < 0) ? 1 : -1), ls3.y, ls3.z);
-        if (dist < 0.7f) rb.velocity = Vector2.zero;
-        else rb.velocity = dir;
-    }
+   
     private void OnTriggerStay2D(Collider2D col)
     {
         if (col.tag == "Player")
@@ -88,11 +70,30 @@ public class Monster : MonoBehaviour
         attackable = true;
     }
 
-    public void Set()
+
+    public override void Init()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+    }
+    // Update is called once per frame
+    public override void AdvanceTime(float dt_sec)
+    {
+        if (hp < 0) return;
+        Vector2 dir = (player.position - transform.position);
+        float dist = dir.magnitude;
+        dir /= dist; //mag
+        dir *= speed;
+        Vector3 ls3 = transform.localScale;
+        transform.localScale = new Vector3((ls3.x) * ((ls3.x * rb.velocity.x < 0) ? 1 : -1), ls3.y, ls3.z);
+        if (dist < 0.7f) rb.velocity = Vector2.zero;
+        else rb.velocity = dir;
+    }
+    public override void Set()
     {
         animator.SetBool("Walk", true);
     }
-    public void Dispose()
+    public override void Dispose()
     {
         rb.velocity = Vector2.zero;
         animator.SetTrigger("Death");

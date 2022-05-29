@@ -3,48 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class MobGenerator : MonoBehaviour
+public class MobGenerator : BaseApplication
 {
     public Transform player;
     public InGameApplication gameApp;
-    public float genDelaySec = 3.0f;
+    public CoinGenerator coinGenerator;
     Dictionary<string, Monster> mobPrefabs = new Dictionary<string, Monster>();
+    public float genDelaySec = 3.0f;
+    private float progTime = 0f;
+    private int genMobCount = -1;
 
-    float borderHalfWidth = 29.0f;
-    float distRange = 20.0f;
-    float borderHalfHeight = 17.6f;
+    const float borderHalfWidth = 29.0f;
+    const float distRange = 20.0f;
+    const float borderHalfHeight = 17.6f;
 
 
-    // Start is called before the first frame update
-    public void Init()
+    void genMonster()
     {
-        mobPrefabs.Add("Air", Resources.Load<Monster>("Prefabs/Monsters/Air"));
-        mobPrefabs.Add("Bat", Resources.Load<Monster>("Prefabs/Monsters/Bat"));
-        mobPrefabs.Add("BatSmall", Resources.Load<Monster>("Prefabs/Monsters/BatSmall"));
-        Set();
-    }
-
-    // Update is called once per frame
-    public void AdvanceTime(float dt_sec)
-    {
-        
-    }
-
-    IEnumerator genMonster()
-    {
-        while (true)
-        {
-            // 임시
-            Monster mob = Instantiate(mobPrefabs.Values.ElementAt(Random.RandomRange(0, 3)), getRandomPosition(), Quaternion.identity);
-            mob.player = player;
-            mob.coinGenerator = gameApp.coinGenerator;
-            //mob.speed = 5;
-            mob.Init();
-            mob.transform.parent = gameObject.transform;
-            gameApp.monsters.Add(mob);
-            genDelaySec -= 0.01f;
-            yield return new WaitForSeconds(genDelaySec);
-        }
+        // 임시
+        Monster mob = Instantiate(mobPrefabs.Values.ElementAt(Random.RandomRange(0, 3)), getRandomPosition(), Quaternion.identity);
+        mob.player = player;
+        mob.coinGenerator = coinGenerator;
+        //mob.speed = 5;
+        mob.Init();
+        mob.transform.parent = gameObject.transform;
+        gameApp.monsters.Add(mob);
+        genDelaySec -= 0.01f;
     }
     public Vector2 getRandomPosition() {
         float px = player.position.x;
@@ -54,13 +38,35 @@ public class MobGenerator : MonoBehaviour
         x += px;
         return new Vector2(x, y);
     }
-    public void Set()
+
+    public override void Init()
     {
-        StopAllCoroutines();
-        StartCoroutine(genMonster());
+        mobPrefabs.Add("Air", Resources.Load<Monster>("Prefabs/Monsters/Air"));
+        mobPrefabs.Add("Bat", Resources.Load<Monster>("Prefabs/Monsters/Bat"));
+        mobPrefabs.Add("BatSmall", Resources.Load<Monster>("Prefabs/Monsters/BatSmall"));
     }
-    public void Dispose()
+
+    public override void AdvanceTime(float dt_sec)
     {
-        StopAllCoroutines();
+        if (genMobCount < 0)
+            return;
+        progTime += dt_sec;
+        int curIndex = (int)(progTime / genDelaySec);
+
+        if(genMobCount < curIndex)
+        {
+            genMobCount++;
+            genMonster();
+        }
+    }
+
+    public override void Set()
+    {
+        genMobCount = 0;
+    }
+
+    public override void Dispose()
+    {
+        genMobCount = -1;
     }
 }

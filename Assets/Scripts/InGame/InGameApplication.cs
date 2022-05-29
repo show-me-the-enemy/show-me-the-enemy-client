@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InGameApplication : BaseApplication
+public class InGameApplication : BaseApplication    
 {
     [SerializeField]
     private InGameModel _model;
@@ -11,12 +11,7 @@ public class InGameApplication : BaseApplication
     [SerializeField]
     private InGameController _controller;
 
-    public CameraController cameraController;
-    public PlayerController playerController;
-    public TileScroller tileScroller;
-    public MobGenerator mobGenerator;
-    public CoinGenerator coinGenerator;
-    public WeaponManager weaponManager;
+    public List<BaseApplication> contollers;
     public List<Monster> monsters = new List<Monster>();
 
     public InGameModel Model
@@ -35,6 +30,8 @@ public class InGameApplication : BaseApplication
 
     public override void Init()
     {
+        Debug.Log("app");
+        Debug.Log(_controller);
         _controller.Init();
     }
 

@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.U2D;
 
 
-public class CameraController : MonoBehaviour
+public class CameraController : BaseApplication
 {
     public Transform player;
     public Transform[] xFollowers;
 
-    public void Init()
+    public override void Init()
     {
         float wph = Screen.width / Screen.height;
         int halfX = Screen.width / 2;
@@ -20,10 +20,20 @@ public class CameraController : MonoBehaviour
         GetComponent<PixelPerfectCamera>().refResolutionY = halfY;
     }
 
-    public void AdvanceTime(float dt_sec)
+    public override void AdvanceTime(float dt_sec)
     {
         transform.position = new Vector3(player.position.x, player.position.y, transform.position.z);
         foreach(Transform t in xFollowers)
             t.position = new Vector3(player.position.x, t.position.y, t.position.z);
+    }
+
+    public override void Set()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Dispose()
+    {
+        throw new System.NotImplementedException();
     }
 }

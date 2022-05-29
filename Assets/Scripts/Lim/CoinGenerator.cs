@@ -5,7 +5,7 @@ using UnityEngine;
 public class CoinGenerator : MonoBehaviour
 {
     Dictionary<string, Coin> coinPrefabs = new Dictionary<string, Coin>();
-    public void Init()
+    public void Start()
     {
         coinPrefabs.Add("blue", Resources.Load<Coin>("Prefabs/Items/BlueCoin"));
         coinPrefabs.Add("gold", Resources.Load<Coin>("Prefabs/Items/GoldCoin"));

@@ -12,7 +12,7 @@ public class WeaponManager : MonoBehaviour
     [SerializeField]
     List<IWeapon> weapons = new List<IWeapon>();
 
-    public void Init()
+    public void Start()
     {
         foreach(IWeapon w in weapons)
         {
