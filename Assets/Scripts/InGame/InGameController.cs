@@ -35,7 +35,12 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         overPanel.SetActive(false);
         buildupPanel.SetActive(false);
         InitHandlers();
+#if UNITY_EDITOR
         ChangeState(EInGameState.BATTLE);
+
+#else
+        ChangeState(EInGameState.LOADING);
+#endif
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameStatusResponse);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameFinished);
@@ -96,7 +101,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
     }
 
-    #region State Handlers Base
+#region State Handlers Base
     private Dictionary<EInGameState, IInGameStateHandler> _handlers = new Dictionary<EInGameState, IInGameStateHandler>();
     private EInGameState _currentState = EInGameState.UNKNOWN;
 
@@ -144,9 +149,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
         return null;
     }
-    #endregion
+#endregion
 
-    #region State Handler Class
+#region State Handler Class
     protected class StateHandlerLoading : IInGameStateHandler
     {
         private InGameController _controller;
@@ -321,7 +326,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
 
     }
-    #endregion
+#endregion
 }
 public interface IInGameStateHandler
 {
