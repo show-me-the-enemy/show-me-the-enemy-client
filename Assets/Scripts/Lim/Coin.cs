@@ -27,6 +27,7 @@ public class Coin : MonoBehaviour
     }
     public int GetCoin()
     {
+        StopCoroutine(animRoutine());
         StartCoroutine(DestroyRoutine());
         return amount;
     }
@@ -38,11 +39,6 @@ public class Coin : MonoBehaviour
             transform.localScale = new Vector3((float)transform.localScale.x-ds, (float)transform.localScale.y-ds, (float)transform.localScale.z);
             yield return new WaitForSeconds(0.05f);
         }
-        Dispose();
-    }
-    void Dispose()
-    {
-        StopAllCoroutines();
         Destroy(gameObject);
     }
 }
