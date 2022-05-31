@@ -119,6 +119,7 @@ public class NetworkManager : MonoBehaviour
         else
             req.crystal = 50;
         req.numRound = round;
+        Debug.LogError("GameResult");
         StartCoroutine(API_GameResult(req));
     }
 
@@ -284,12 +285,12 @@ public class NetworkManager : MonoBehaviour
     }
     IEnumerator API_GameResult(UserGameResultRequest userRequest)
     {
+        Debug.LogError("a");
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users";
         string json = JsonUtility.ToJson(userRequest);
-        Debug.LogError("b");
         using (UnityWebRequest request = UnityWebRequest.Put(url, json))
         {
-            Debug.LogError("c");
+            Debug.LogError("b");
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(json);
             request.uploadHandler = new UploadHandlerRaw(jsonToSend);
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -298,7 +299,7 @@ public class NetworkManager : MonoBehaviour
 
             yield return request.SendWebRequest();
 
-            Debug.LogError("d");
+            Debug.LogError("c");
             if (request.isNetworkError || request.isHttpError)
             {
                 Debug.LogError(request.error);
@@ -306,7 +307,7 @@ public class NetworkManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("c");
+                Debug.LogError("d");
                 UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
                 string resJson = JsonUtility.ToJson(res);
                 Debug.Log(resJson);

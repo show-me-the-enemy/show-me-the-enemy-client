@@ -16,17 +16,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     public float buildupLength = 10;
     public UiBarView topBar;
 
-    public void GameOver()
-    {
-        StartCoroutine(PopOverRoutine());
-    }
-    IEnumerator PopOverRoutine()
-    {
-        yield return new WaitForSeconds(1f);
-        overPanel.SetActive(true);
-        yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene("LobbyScene");
-    }
     #endregion
 
     public void Init()
@@ -36,8 +25,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         buildupPanel.SetActive(false);
         InitHandlers();
 #if UNITY_EDITOR
-        ChangeState(EInGameState.BATTLE);
-
+        ChangeState(EInGameState.LOADING);
 #else
         ChangeState(EInGameState.LOADING);
 #endif
@@ -88,15 +76,21 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 break;
             case ENotiMessage.InGameStatusResponse:
                 InGameStatusResponse statusRes = (InGameStatusResponse)noti.data[EDataParamKey.InGameStatusResponse];
-                Debug.Log(statusRes);
+                Debug.Log(statusRes.status);
                 //statusRes.firstUsername
                 //statusRes.id
                 //statusRes.secondUsername
                 //statusRes.status
                 //statusRes.statusCode
+                if (statusRes.status == "FINISHED")
+                {
+                    NetworkManager.Instance.GameResult(5);
+                    _app.DisposeMonster();
+                    ChangeState(EInGameState.DEATH);
+                }
                 break;
             case ENotiMessage.InGameFinished:
-                ChangeState(EInGameState.DEATH);
+                NetworkManager.Instance.PlayerDie();
                 break;
         }
     }
@@ -108,11 +102,11 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     private void InitHandlers()
     {
         _handlers.Clear();
+        _handlers.Add(EInGameState.DEATH, new StateHandlerDeath());
         _handlers.Add(EInGameState.LOADING, new StateHandlerLoading());
         _handlers.Add(EInGameState.BATTLE, new StateHandlerBattle());
         _handlers.Add(EInGameState.UPGRADE, new StateHandlerUpgrade());
         _handlers.Add(EInGameState.PAUSE, new StateHandlerPause());
-        _handlers.Add(EInGameState.DEATH, new StateHandlerDeath());
 
         foreach (EInGameState state in _handlers.Keys)
         {
@@ -123,7 +117,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
     private void ChangeState(EInGameState nextState)
     {
-        Debug.Log(nextState);
         if (nextState != EInGameState.UNKNOWN && nextState != _currentState)
         {
             EInGameState prevState = _currentState;
@@ -134,6 +127,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 leaveHandler.Dispose();
             }
             IInGameStateHandler enterHandler = GetStateHandler(_currentState);
+            Debug.LogError(enterHandler);
             if (enterHandler != null)
             {
                 enterHandler.Set();
@@ -306,6 +300,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     protected class StateHandlerDeath : IInGameStateHandler 
     {
         InGameController _controller;
+        private float _curTime = 0;
         public void Init(InGameController controller)
         {
             _controller = controller;
@@ -313,12 +308,18 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            //NetworkManager.Instance.PlayerDie();
-            _controller.GameOver();
+            _curTime = 0;
+            _controller.overPanel.SetActive(true);
+            _controller._app.DisposeMonster();
         }
 
         public void AdvanceTime(float dt_sec)
         {
+            _curTime += dt_sec;
+            if(_curTime > 4f)
+            {
+                SceneManager.LoadScene("LobbyScene");
+            }
         }
 
         public void Dispose()
