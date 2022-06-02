@@ -178,7 +178,8 @@ public enum ENotiMessage
     NetworkRequestSignUp,
 
     //Response 관련
-    InGameStatusResponse,
+    InGameStartResponse,
+    InGameFinishResponse,
     InGameBuildUpResponse,
 
     //ingame관련

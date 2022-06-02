@@ -9,7 +9,10 @@ public class LobbyUI : MonoBehaviour
     private Text _txtTopBarName;
     public void Start()
     {
-        _txtTopBarName.text = "USERNAME : "+NetworkManager.Instance.UserName;
+        NetworkManager.Instance.UpdateUserInfo();
+        _txtTopBarName.text = "USERNAME : "+NetworkManager.Instance.UserName 
+                            +" crystal : " + NetworkManager.Instance.Craystal
+                            +" numWinds : "+NetworkManager.Instance.NumWins;
     }
     public void OnClick_CreateRoom()
     {

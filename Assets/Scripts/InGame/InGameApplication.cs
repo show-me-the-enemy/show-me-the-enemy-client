@@ -47,13 +47,4 @@ public class InGameApplication : BaseApplication
     {
         _controller.Dispose();
     }
-
-    public void DisposeMonster()
-    {
-        foreach(var m in monsters)
-        {
-            m.Dispose();
-            Destroy(m);
-        }
-    }
 }

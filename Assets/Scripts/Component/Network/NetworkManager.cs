@@ -81,6 +81,30 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    private int _maxRound = 0;
+    public int MaxRound
+    {
+        get
+        {
+            return _maxRound;
+        }
+    }
+    private int _crystal = 0;
+    public int Craystal
+    {
+        get
+        {
+            return _crystal;
+        }
+    }
+    private int _numWins = 0;
+    public int NumWins
+    {
+        get
+        {
+            return _numWins;
+        }
+    }
     #endregion
 
     void Awake()
@@ -88,9 +112,10 @@ public class NetworkManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.NetworkRequestLogin);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.NetworkRequestSignUp);
-    
+
     }
 
+    #region nomal function
     public void CreateRoom()
     {
         _isIngameDie = false;
@@ -108,8 +133,14 @@ public class NetworkManager : MonoBehaviour
         StartCoroutine(API_PlayerDie());
     }
 
+    public void UpdateUserInfo()
+    {
+        StartCoroutine(API_GetStatusInLobby());
+    }
+
     public void GameResult(int round)
     {
+        DisconnectSocket();
         UserGameResultRequest req = new UserGameResultRequest();
         req.username = _username;
         req.gameId = _currentRoomId;
@@ -120,12 +151,16 @@ public class NetworkManager : MonoBehaviour
             req.crystal = 50;
         req.numRound = round;
         Debug.LogError("GameResult");
-        StartCoroutine(API_GameResult(req));
+        StartCoroutine(API_GameResult(req, () =>
+         {
+             SceneManager.LoadScene("LobbyScene");
+         }));
     }
+    #endregion
 
     public void OnNotification(Notification noti)
     {
-        if(noti.data[EDataParamKey.UserLoginRequest]!=null)
+        if (noti.data[EDataParamKey.UserLoginRequest] != null)
         {
             UserLoginRequest request = noti.data[EDataParamKey.UserLoginRequest] as UserLoginRequest;
             StartCoroutine(API_Login(request, (callback) =>
@@ -133,7 +168,7 @@ public class NetworkManager : MonoBehaviour
                 SceneManager.LoadScene("LobbyScene");
             }));
         }
-        else if(noti.data[EDataParamKey.UserSignUpRequest] != null)
+        else if (noti.data[EDataParamKey.UserSignUpRequest] != null)
         {
             UserSignUpRequest request = noti.data[EDataParamKey.UserSignUpRequest] as UserSignUpRequest;
             StartCoroutine(API_SignUp(request));
@@ -203,12 +238,12 @@ public class NetworkManager : MonoBehaviour
     #region GameRoom API
     IEnumerator API_RoomCreate()
     {
-        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games/start/"+_username;
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games/start/" + _username;
         WWWForm form = new WWWForm();
         using (UnityWebRequest request = UnityWebRequest.Post(url, form))
         {
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-            request.SetRequestHeader("Authorization", "Bearer "+_accessToken);
+            request.SetRequestHeader("Authorization", "Bearer " + _accessToken);
 
             yield return request.SendWebRequest();
 
@@ -256,6 +291,29 @@ public class NetworkManager : MonoBehaviour
             }
         }
     }
+
+    IEnumerator API_DeleteAllGames()
+    {
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games";
+        Debug.Log(url);
+        using (UnityWebRequest request = UnityWebRequest.Delete(url))
+        {
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", "Bearer "+_accessToken);
+
+            yield return request.SendWebRequest();
+            // 에러 발생 시
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log(request.error);
+            }
+            else
+            {
+                string json = JsonUtility.ToJson(request.downloadHandler.text); // 파일 다운로드
+                Debug.Log(json);
+            }
+        }
+    }
     #endregion
 
     #region GamePlay API
@@ -283,7 +341,7 @@ public class NetworkManager : MonoBehaviour
             }
         }
     }
-    IEnumerator API_GameResult(UserGameResultRequest userRequest)
+    IEnumerator API_GameResult(UserGameResultRequest userRequest, Action callback)
     {
         Debug.LogError("a");
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users";
@@ -311,8 +369,52 @@ public class NetworkManager : MonoBehaviour
                 UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
                 string resJson = JsonUtility.ToJson(res);
                 Debug.Log(resJson);
-                //DisconnectSocket();
+                callback();
             }
+        }
+    }
+    #endregion
+
+    #region LobbyAPI
+    IEnumerator API_GetStatusInLobby()
+    {
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users/lobby/" + _username;
+        Debug.Log(url);
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+            // 에러 발생 시
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log(request.error);
+            }
+            else
+            {
+                string json = JsonUtility.ToJson(request.downloadHandler.text); // 파일 다운로드
+                Debug.Log(json);
+            }
+
+            //request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            //request.SetRequestHeader("Content-Type", "application/json");
+            //request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(""));
+            //yield return request.SendWebRequest();
+
+            //if (request.isNetworkError || request.isHttpError)
+            //{
+            //    Debug.LogError(request.error);
+            //    Debug.LogError(request.downloadHandler.text);
+            //}
+            //else
+            //{
+            //    UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
+            //    string resJson = JsonUtility.ToJson(res);
+            //    _maxRound = res.maxRound;
+            //    _crystal = res.crystal;
+            //    _numWins = res.numWins;
+            //}
         }
     }
     #endregion
@@ -345,7 +447,7 @@ public class NetworkManager : MonoBehaviour
 
         var sub = new StompMessage("SUBSCRIBE");
         sub["id"] = "sub-" + _currentRoomId.ToString();
-        sub["destination"] = "/sub/games/"+ _currentRoomId.ToString();
+        sub["destination"] = "/sub/games/" + _currentRoomId.ToString();
         ws.Send(serializer.Serialize(sub));
         Console.ReadKey(true);
     }
@@ -366,7 +468,7 @@ public class NetworkManager : MonoBehaviour
                 ws.Close();
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Debug.LogError(e.ToString());
         }
@@ -389,13 +491,14 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log(msg.Body);
                 break;
             case "MESSAGE":
-                if(msg.Headers["game-status"] =="start" || msg.Headers["game-status"] == "finish")
+                if (msg.Headers["game-status"] == "start")
                 {
                     _isGameReady = true;
-                    InGameStatusResponse res = JsonUtility.FromJson<InGameStatusResponse>(msg.Body);
-                    Hashtable sendData = new Hashtable();
-                    sendData.Add(EDataParamKey.InGameStatusResponse, res);
-                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameStatusResponse, sendData);
+                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameStartResponse);
+                }
+                else if (msg.Headers["game-status"] == "finish")
+                {
+                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameFinishResponse);
                 }
                 else
                 {
@@ -404,7 +507,7 @@ public class NetworkManager : MonoBehaviour
                     sendData.Add(EDataParamKey.InGameBuildUpResponse, res);
                     NotificationCenter.Instance.PostNotification(ENotiMessage.InGameBuildUpResponse, sendData);
                 }
-                
+
                 //foreach(var h in msg.Headers.Keys)
                 //{
                 //    Debug.Log("Key : " + h + ", Value : " + msg.Headers[h]);
@@ -426,7 +529,7 @@ public class NetworkManager : MonoBehaviour
     public void SendBuildUpMsg(int nMonsters, int nItem)
     {
         StompMessageSerializer serializer = new StompMessageSerializer();
-        var request = new InGameBuildUpRequest() { id = _currentRoomId, sender = _username,numMonsters = nMonsters,numItem= nItem };
+        var request = new InGameBuildUpRequest() { id = _currentRoomId, sender = _username, numMonsters = nMonsters, numItem = nItem };
         var broad = new StompMessage("SEND", JsonUtility.ToJson(request));
         broad["content-type"] = "application/json";
         broad["destination"] = "/pub/build-up";
