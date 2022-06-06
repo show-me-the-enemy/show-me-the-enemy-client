@@ -62,7 +62,6 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
 
     public void Set()
     {
-        Debug.Log("Regen");
         genMobCount = 0;
         progTime = 0f;
     }

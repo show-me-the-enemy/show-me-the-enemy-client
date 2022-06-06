@@ -7,16 +7,20 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     public InGameController _game;
     public Animator animator;
     private Rigidbody2D rb;
-    public float speed;
     public Transform fireRoot;
     public UiBarView hpBar;
+    public HudController hudController;
+    public WeaponManager weaponManager;
+    public InGameModel gameModel;
+    [HideInInspector]
+    public float speed;
+    [HideInInspector]
     public float maxHp = 100f;
     private float hp;
-    public int coinAmout = 0;
-    public HudController hudController;
+    [HideInInspector]
+    public float defensive = 1.0f;
 
-    public WeaponManager weaponManager;
-    private List<IWeapon> weaphons = new List<IWeapon>();
+    private List<IWeapon> weapons = new List<IWeapon>();
 
     private bool isImmotal = false;
     public float immotalTime = 0.1f;
@@ -26,7 +30,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     {
         if (isImmotal || hp < 0) return;
         animator.SetTrigger("Damaged");
-        hp -= d;
+        hp -= defensive*d;
         hpBar.setValue(hp / maxHp);
         if (hp < 0) Death();
         else StartCoroutine(SetImmotal());
@@ -60,16 +64,18 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
         if (col.tag == "Coin")
         {
             Coin c = col.GetComponent<Coin>();
-            coinAmout += c.GetCoin();
-            hudController.UpdateCoinText(coinAmout);
+            gameModel.SaveCoin(c.GetCoin());
         }
     }
-
-
+    public void AddWeapon(IWeapon w)
+    {
+        weapons.Add(w);
+    }
     public void Init()
     {
-        weaphons.Add(weaponManager.GetWeapon("whip"));
-        weaphons.Add(weaponManager.GetWeapon("dagger"));
+        IWeapon w = weaponManager.GetWeapon("Whip");
+        w.AddLevel(); // 하면 무기에서 플레이어 참조해서 무기 추가해줌 쓰레기코드임.. ㅈㅅ
+        AddWeapon(w);
         rb = GetComponent<Rigidbody2D>();
     }
     public void AdvanceTime(float dt_sec)
@@ -96,19 +102,19 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
         float mag_vel = rb.velocity.magnitude;
         animator.SetFloat("MagVel", mag_vel);
 
-        foreach (IWeapon w in weaphons)
+        foreach (IWeapon w in weapons)
         {
             string action = w.AtUpdate(dt_sec);
             if (action.Length > 0)
                 animator.SetTrigger(action);
-
         }
     }
     public void Set()
     {
+        Debug.Log("asdf");
         animator.enabled = true;
         hp = maxHp;
-        hpBar.setValue(1);
+        hpBar.setValue(hp / maxHp);
     }
     public void Dispose()
     {

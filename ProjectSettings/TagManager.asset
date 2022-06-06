@@ -55,11 +55,11 @@ TagManager:
   - name: Monster
     uniqueID: 428206335
     locked: 0
-  - name: Player
-    uniqueID: 3078030833
-    locked: 0
   - name: Fire
     uniqueID: 1682299601
+    locked: 0
+  - name: Player
+    uniqueID: 3078030833
     locked: 0
   - name: Object
     uniqueID: 2943613177
