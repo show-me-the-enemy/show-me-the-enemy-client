@@ -289,6 +289,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Dispose()
         {
+            if (_controller.buildupManager.isPurchase)
+                _controller.gameModel.AddBuyLevel();
             _controller.buildupManager.gameObject.SetActive(false);
         }
 

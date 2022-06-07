@@ -9,14 +9,13 @@ public class BuildupManager : MonoBehaviour
     public PlayerController player;
     WeaponManager weaponManager;
     AccessoryManager accessoryManager;
-    bool isPurchase = false;
+    public bool isPurchase = false;
 
     List<IWeapon> weapons = new List<IWeapon>();
     List<IAccessory> accessories = new List<IAccessory>();
 
     public void Init()
     {
-        if (gameModel.weaponManager == null) Debug.Log("Fuckyoy");
         weaponManager = gameModel.weaponManager;
         accessoryManager = gameModel.accessoryManager;
     }
@@ -70,6 +69,8 @@ public class BuildupManager : MonoBehaviour
     }
     public void ItemOnClick(int idx)
     {
+        if (!gameModel.Purchase(gameModel.GetBuildupItemPrice())) return;
+        buildupItems[idx].SetPurchaseCompleted();
         if (idx < weapons.Count)
         {
             int lev = weapons[idx].AddLevel();
@@ -80,5 +81,6 @@ public class BuildupManager : MonoBehaviour
             idx -= weapons.Count;
             accessories[idx].AddLevel();
         }
+        isPurchase = true;
     }
 }

@@ -111,7 +111,6 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     }
     public void Set()
     {
-        Debug.Log("asdf");
         animator.enabled = true;
         hp = maxHp;
         hpBar.setValue(hp / maxHp);
