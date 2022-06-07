@@ -81,6 +81,30 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    private int _maxRound = 0;
+    public int MaxRound
+    {
+        get
+        {
+            return _maxRound;
+        }
+    }
+    private int _crystal = 0;
+    public int Craystal
+    {
+        get
+        {
+            return _crystal;
+        }
+    }
+    private int _numWins = 0;
+    public int NumWins
+    {
+        get
+        {
+            return _numWins;
+        }
+    }
     #endregion
 
     void Awake()
@@ -88,9 +112,27 @@ public class NetworkManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.NetworkRequestLogin);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.NetworkRequestSignUp);
-    
+
     }
 
+    public void OnNotification(Notification noti)
+    {
+        if (noti.data[EDataParamKey.UserLoginRequest] != null)
+        {
+            UserLoginRequest request = noti.data[EDataParamKey.UserLoginRequest] as UserLoginRequest;
+            StartCoroutine(API_Login(request, (callback) =>
+            {
+                SceneManager.LoadScene("LobbyScene");
+            }));
+        }
+        else if (noti.data[EDataParamKey.UserSignUpRequest] != null)
+        {
+            UserSignUpRequest request = noti.data[EDataParamKey.UserSignUpRequest] as UserSignUpRequest;
+            StartCoroutine(API_SignUp(request));
+        }
+    }
+
+    #region nomal function
     public void CreateRoom()
     {
         _isIngameDie = false;
@@ -108,8 +150,19 @@ public class NetworkManager : MonoBehaviour
         StartCoroutine(API_PlayerDie());
     }
 
+    public void UpdateUserInfo()
+    {
+        StartCoroutine(API_GetStatusInLobby());
+    }
+
+    public void GetTopTenRaking()
+    {
+        StartCoroutine(API_GetTopTenRanking());
+    }
+
     public void GameResult(int round)
     {
+        DisconnectSocket();
         UserGameResultRequest req = new UserGameResultRequest();
         req.username = _username;
         req.gameId = _currentRoomId;
@@ -119,25 +172,13 @@ public class NetworkManager : MonoBehaviour
         else
             req.crystal = 50;
         req.numRound = round;
-        StartCoroutine(API_GameResult(req));
+        Debug.LogError("GameResult");
+        StartCoroutine(API_GameResult(req, () =>
+         {
+             SceneManager.LoadScene("LobbyScene");
+         }));
     }
-
-    public void OnNotification(Notification noti)
-    {
-        if(noti.data[EDataParamKey.UserLoginRequest]!=null)
-        {
-            UserLoginRequest request = noti.data[EDataParamKey.UserLoginRequest] as UserLoginRequest;
-            StartCoroutine(API_Login(request, (callback) =>
-            {
-                SceneManager.LoadScene("LobbyScene");
-            }));
-        }
-        else if(noti.data[EDataParamKey.UserSignUpRequest] != null)
-        {
-            UserSignUpRequest request = noti.data[EDataParamKey.UserSignUpRequest] as UserSignUpRequest;
-            StartCoroutine(API_SignUp(request));
-        }
-    }
+    #endregion
 
     #region Login Register API
     IEnumerator API_SignUp(UserSignUpRequest userRequest)
@@ -202,12 +243,12 @@ public class NetworkManager : MonoBehaviour
     #region GameRoom API
     IEnumerator API_RoomCreate()
     {
-        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games/start/"+_username;
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games/start/" + _username;
         WWWForm form = new WWWForm();
         using (UnityWebRequest request = UnityWebRequest.Post(url, form))
         {
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-            request.SetRequestHeader("Authorization", "Bearer "+_accessToken);
+            request.SetRequestHeader("Authorization", "Bearer " + _accessToken);
 
             yield return request.SendWebRequest();
 
@@ -255,6 +296,29 @@ public class NetworkManager : MonoBehaviour
             }
         }
     }
+
+    IEnumerator API_DeleteAllGames()
+    {
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games";
+        Debug.Log(url);
+        using (UnityWebRequest request = UnityWebRequest.Delete(url))
+        {
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", "Bearer "+_accessToken);
+
+            yield return request.SendWebRequest();
+            // 에러 발생 시
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log(request.error);
+            }
+            else
+            {
+                string json = JsonUtility.ToJson(request.downloadHandler.text); // 파일 다운로드
+                Debug.Log(json);
+            }
+        }
+    }
     #endregion
 
     #region GamePlay API
@@ -282,14 +346,14 @@ public class NetworkManager : MonoBehaviour
             }
         }
     }
-    IEnumerator API_GameResult(UserGameResultRequest userRequest)
+    IEnumerator API_GameResult(UserGameResultRequest userRequest, Action callback)
     {
+        Debug.LogError("a");
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users";
         string json = JsonUtility.ToJson(userRequest);
-        Debug.LogError("b");
         using (UnityWebRequest request = UnityWebRequest.Put(url, json))
         {
-            Debug.LogError("c");
+            Debug.LogError("b");
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(json);
             request.uploadHandler = new UploadHandlerRaw(jsonToSend);
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -298,7 +362,7 @@ public class NetworkManager : MonoBehaviour
 
             yield return request.SendWebRequest();
 
-            Debug.LogError("d");
+            Debug.LogError("c");
             if (request.isNetworkError || request.isHttpError)
             {
                 Debug.LogError(request.error);
@@ -306,11 +370,74 @@ public class NetworkManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("c");
+                Debug.LogError("d");
                 UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
                 string resJson = JsonUtility.ToJson(res);
                 Debug.Log(resJson);
-                //DisconnectSocket();
+                callback();
+            }
+        }
+    }
+    #endregion
+
+    #region LobbyAPI
+    IEnumerator API_GetStatusInLobby()
+    {
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users/lobby/" + _username;
+        Debug.Log(url);
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", "Bearer " + _accessToken);
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError)
+            {
+                Debug.Log(request.error);
+            }
+            else if(request.isHttpError)
+            {
+                Debug.Log(request.error);
+            }
+            else
+            {
+                UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
+                string resJson = JsonUtility.ToJson(res);
+                _maxRound = res.maxRound;
+                _crystal = res.crystal;
+                _numWins = res.numWins;
+                NotificationCenter.Instance.PostNotification(ENotiMessage.UpdatePlayerDate);
+                Debug.Log(resJson);
+            }
+        }
+    }
+
+    IEnumerator API_GetTopTenRanking()
+    {
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users/rankings";
+        Debug.Log(url);
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", "Bearer " + _accessToken);
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError|| request.isHttpError)
+            {
+                Debug.Log(request.error);
+            }
+            else
+            {
+                string tempStr = "{\"Items\":" + request.downloadHandler.text + "}";
+                TopTenUsersRankResponse res = JsonUtility.FromJson<TopTenUsersRankResponse>(tempStr);
+
+                Hashtable sendData = new Hashtable();
+                sendData.Add(EDataParamKey.TopTenUsersRankResponse, res);
+                NotificationCenter.Instance.PostNotification(ENotiMessage.TopTenUsersRankResponse, sendData);
             }
         }
     }
@@ -344,7 +471,7 @@ public class NetworkManager : MonoBehaviour
 
         var sub = new StompMessage("SUBSCRIBE");
         sub["id"] = "sub-" + _currentRoomId.ToString();
-        sub["destination"] = "/sub/games/"+ _currentRoomId.ToString();
+        sub["destination"] = "/sub/games/" + _currentRoomId.ToString();
         ws.Send(serializer.Serialize(sub));
         Console.ReadKey(true);
     }
@@ -365,7 +492,7 @@ public class NetworkManager : MonoBehaviour
                 ws.Close();
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Debug.LogError(e.ToString());
         }
@@ -388,13 +515,14 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log(msg.Body);
                 break;
             case "MESSAGE":
-                if(msg.Headers["game-status"] =="start" || msg.Headers["game-status"] == "finish")
+                if (msg.Headers["game-status"] == "start")
                 {
                     _isGameReady = true;
-                    InGameStatusResponse res = JsonUtility.FromJson<InGameStatusResponse>(msg.Body);
-                    Hashtable sendData = new Hashtable();
-                    sendData.Add(EDataParamKey.InGameStatusResponse, res);
-                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameStatusResponse, sendData);
+                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameStartResponse);
+                }
+                else if (msg.Headers["game-status"] == "finish")
+                {
+                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameFinishResponse);
                 }
                 else
                 {
@@ -403,7 +531,7 @@ public class NetworkManager : MonoBehaviour
                     sendData.Add(EDataParamKey.InGameBuildUpResponse, res);
                     NotificationCenter.Instance.PostNotification(ENotiMessage.InGameBuildUpResponse, sendData);
                 }
-                
+
                 //foreach(var h in msg.Headers.Keys)
                 //{
                 //    Debug.Log("Key : " + h + ", Value : " + msg.Headers[h]);
@@ -425,7 +553,7 @@ public class NetworkManager : MonoBehaviour
     public void SendBuildUpMsg(int nMonsters, int nItem)
     {
         StompMessageSerializer serializer = new StompMessageSerializer();
-        var request = new InGameBuildUpRequest() { id = _currentRoomId, sender = _username,numMonsters = nMonsters,numItem= nItem };
+        var request = new InGameBuildUpRequest() { id = _currentRoomId, sender = _username, numMonsters = nMonsters, numItem = nItem };
         var broad = new StompMessage("SEND", JsonUtility.ToJson(request));
         broad["content-type"] = "application/json";
         broad["destination"] = "/pub/build-up";
@@ -434,86 +562,3 @@ public class NetworkManager : MonoBehaviour
     #endregion
 }
 
-
-//나중에 다른곳으로 따로 빼야할듯
-#region network Request class
-[System.Serializable]
-public class UserLoginRequest
-{
-    public string username;
-    public string password;
-}
-
-[System.Serializable]
-public class UserSignUpRequest
-{
-    public string username;
-    public string password;
-    public string matchingPassword;
-}
-[System.Serializable]
-public class InGameBuildUpRequest
-{
-    public int id;
-    public string sender;
-    public int numMonsters;
-    public int numItem;
-}
-
-[System.Serializable]
-public class UserGameResultRequest
-{
-    public long gameId;
-    public string username;
-    public int numRound;
-    public int crystal;
-    public bool won;
-}
-
-#endregion
-
-#region network Response class
-[System.Serializable]
-public class UserLoginResponse
-{
-    public int statusCode;
-    public string message;
-    public string accessToken;
-    public string refreshToken;
-}
-[System.Serializable]
-public class GameRoomResponse
-{
-    public int statusCode;
-    public int id;
-    public string firstUsername;
-    public string secondUsername;
-    public string status;
-}
-[System.Serializable]
-public class InGameBuildUpResponse
-{
-    public string sender;
-    public string status;
-    public int numMonsters;
-    public int numItem;
-}
-[System.Serializable]
-public class InGameStatusResponse
-{
-    public int statusCode;
-    public int id;
-    public string firstUsername;
-    public string secondUsername;
-    public string status;
-}
-[System.Serializable]
-public class UserGameResultResponse
-{
-    public int statusCode;
-    public string username;
-    public int maxRound;
-    public int crystal;
-    public int numWins;
-}
-#endregion

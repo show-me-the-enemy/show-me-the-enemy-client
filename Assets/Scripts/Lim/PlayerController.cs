@@ -37,11 +37,12 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     }
     void Death()
     {
+        NetworkManager.Instance.PlayerDie();
         hp = -1f;
         isImmotal = true;
         rb.velocity = Vector2.zero;
         animator.SetTrigger("Death");
-        NotificationCenter.Instance.PostNotification(ENotiMessage.InGameFinished);
+        Debug.LogError("Death Player");
     }
     public Vector2 GetDirection()
     {

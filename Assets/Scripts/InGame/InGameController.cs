@@ -14,17 +14,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     public HudController hudController;
     public InGameModel gameModel;
 
-    public void GameOver()
-    {
-        StartCoroutine(PopOverRoutine());
-    }
-    IEnumerator PopOverRoutine()
-    {
-        yield return new WaitForSeconds(1f);
-        overPanel.SetActive(true);
-        yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene("LobbyScene");
-    }
     #endregion
 
     public void Init()
@@ -36,14 +25,13 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         buildupManager.Init();
         InitHandlers();
 #if UNITY_EDITOR
-        ChangeState(EInGameState.BATTLE);
-
+        ChangeState(EInGameState.LOADING);
 #else
         ChangeState(EInGameState.LOADING);
 #endif
-        NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameStatusResponse);
+        NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameStartResponse);
+        NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameFinishResponse);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
-        NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameFinished);
     }
 
     public void Set()
@@ -65,6 +53,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         {
             GetStateHandler(_currentState).Dispose();
         }
+
+        NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.InGameFinishResponse);
+        NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.InGameStartResponse);
+        NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
     }
 
     public void SetActive(bool flag)
@@ -75,10 +67,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     //이런식으로 받아서 사용하면 됌
     private void OnNotification(Notification noti)
     {
-        switch(noti.msg)
+        switch (noti.msg)
         {
             case ENotiMessage.InGameBuildUpResponse:
-                
+
                 InGameBuildUpResponse buildUpRes = (InGameBuildUpResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
                 Debug.Log(buildUpRes);
                 //buildUpRes.numItem
@@ -86,33 +78,29 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 //buildUpRes.sender
                 //buildUpRes.status
                 break;
-            case ENotiMessage.InGameStatusResponse:
-                InGameStatusResponse statusRes = (InGameStatusResponse)noti.data[EDataParamKey.InGameStatusResponse];
-                Debug.Log(statusRes);
+            case ENotiMessage.InGameFinishResponse:
+                ChangeState(EInGameState.DEATH);
                 //statusRes.firstUsername
                 //statusRes.id
                 //statusRes.secondUsername
                 //statusRes.status
                 //statusRes.statusCode
                 break;
-            case ENotiMessage.InGameFinished:
-                ChangeState(EInGameState.DEATH);
-                break;
         }
     }
 
-#region State Handlers Base
+    #region State Handlers Base
     private Dictionary<EInGameState, IInGameStateHandler> _handlers = new Dictionary<EInGameState, IInGameStateHandler>();
     private EInGameState _currentState = EInGameState.UNKNOWN;
 
     private void InitHandlers()
     {
         _handlers.Clear();
+        _handlers.Add(EInGameState.DEATH, new StateHandlerDeath());
         _handlers.Add(EInGameState.LOADING, new StateHandlerLoading());
         _handlers.Add(EInGameState.BATTLE, new StateHandlerBattle());
         _handlers.Add(EInGameState.UPGRADE, new StateHandlerUpgrade());
         _handlers.Add(EInGameState.PAUSE, new StateHandlerPause());
-        _handlers.Add(EInGameState.DEATH, new StateHandlerDeath());
 
         foreach (EInGameState state in _handlers.Keys)
         {
@@ -133,6 +121,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 leaveHandler.Dispose();
             }
             IInGameStateHandler enterHandler = GetStateHandler(_currentState);
+            Debug.LogError(enterHandler);
             if (enterHandler != null)
             {
                 enterHandler.Set();
@@ -148,9 +137,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
         return null;
     }
-#endregion
+    #endregion
 
-#region State Handler Class
+    #region State Handler Class
     protected class StateHandlerLoading : IInGameStateHandler
     {
         private InGameController _controller;
@@ -168,7 +157,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void AdvanceTime(float dt_sec)
         {
-            if(NetworkManager.Instance.IsGameReady)
+            if (NetworkManager.Instance.IsGameReady)
             {
                 _controller.ChangeState(EInGameState.BATTLE); //배틀 스테이지로 넘어감
             }
@@ -191,14 +180,14 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             Debug.Log("battle init");
             _controller = controller;
             _currentPlayTime = 0;
-            foreach(BaseElement.IBaseController ba in _controller._app.contollers)
+            foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
                 if (ba != null) ba.Init();
             }
             foreach (Monster mob in _controller._app.monsters)
             {
-                if(mob != null )
-                    mob.Init(); 
+                if (mob != null)
+                    mob.Init();
             }
         }
 
@@ -228,7 +217,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             }
             foreach (Monster mob in _controller._app.monsters)
             {
-                if(mob!= null )
+                if (mob != null)
                     mob.AdvanceTime(dt_sec);
             }
 
@@ -315,7 +304,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
 
     }
-    protected class StateHandlerDeath : IInGameStateHandler 
+    protected class StateHandlerDeath : IInGameStateHandler
     {
         InGameController _controller;
         public void Init(InGameController controller)
@@ -325,8 +314,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            //NetworkManager.Instance.PlayerDie();
-            _controller.GameOver();
+            _controller.overPanel.SetActive(true);
+            NetworkManager.Instance.GameResult(5);
         }
 
         public void AdvanceTime(float dt_sec)
@@ -338,7 +327,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
 
     }
-#endregion
+    #endregion
 }
 public interface IInGameStateHandler
 {

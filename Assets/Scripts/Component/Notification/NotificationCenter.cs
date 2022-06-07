@@ -178,8 +178,13 @@ public enum ENotiMessage
     NetworkRequestSignUp,
 
     //Response 관련
-    InGameStatusResponse,
+    InGameStartResponse,
+    InGameFinishResponse,
     InGameBuildUpResponse,
+    TopTenUsersRankResponse,
+
+    //Player Data관련
+    UpdatePlayerDate,
 
     //ingame관련
     InGameFinished,
@@ -195,4 +200,6 @@ public enum EDataParamKey
     //Response 관련
     InGameStatusResponse,
     InGameBuildUpResponse,
+    TopTenUsersRankResponse,
+    
 }
