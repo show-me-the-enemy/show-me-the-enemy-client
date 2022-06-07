@@ -155,6 +155,11 @@ public class NetworkManager : MonoBehaviour
         StartCoroutine(API_GetStatusInLobby());
     }
 
+    public void GetTopTenRaking()
+    {
+        StartCoroutine(API_GetTopTenRanking());
+    }
+
     public void GameResult(int round)
     {
         DisconnectSocket();
@@ -408,6 +413,34 @@ public class NetworkManager : MonoBehaviour
             }
         }
     }
+
+    IEnumerator API_GetTopTenRanking()
+    {
+        string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users/rankings";
+        Debug.Log(url);
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", "Bearer " + _accessToken);
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError|| request.isHttpError)
+            {
+                Debug.Log(request.error);
+            }
+            else
+            {
+                string tempStr = "{\"Items\":" + request.downloadHandler.text + "}";
+                TopTenUsersRankResponse res = JsonUtility.FromJson<TopTenUsersRankResponse>(tempStr);
+
+                Hashtable sendData = new Hashtable();
+                sendData.Add(EDataParamKey.TopTenUsersRankResponse, res);
+                NotificationCenter.Instance.PostNotification(ENotiMessage.TopTenUsersRankResponse, sendData);
+            }
+        }
+    }
     #endregion
 
     #region WebSocket
@@ -529,86 +562,3 @@ public class NetworkManager : MonoBehaviour
     #endregion
 }
 
-
-//나중에 다른곳으로 따로 빼야할듯
-#region network Request class
-[System.Serializable]
-public class UserLoginRequest
-{
-    public string username;
-    public string password;
-}
-
-[System.Serializable]
-public class UserSignUpRequest
-{
-    public string username;
-    public string password;
-    public string matchingPassword;
-}
-[System.Serializable]
-public class InGameBuildUpRequest
-{
-    public int id;
-    public string sender;
-    public int numMonsters;
-    public int numItem;
-}
-
-[System.Serializable]
-public class UserGameResultRequest
-{
-    public long gameId;
-    public string username;
-    public int numRound;
-    public int crystal;
-    public bool won;
-}
-
-#endregion
-
-#region network Response class
-[System.Serializable]
-public class UserLoginResponse
-{
-    public int statusCode;
-    public string message;
-    public string accessToken;
-    public string refreshToken;
-}
-[System.Serializable]
-public class GameRoomResponse
-{
-    public int statusCode;
-    public int id;
-    public string firstUsername;
-    public string secondUsername;
-    public string status;
-}
-[System.Serializable]
-public class InGameBuildUpResponse
-{
-    public string sender;
-    public string status;
-    public int numMonsters;
-    public int numItem;
-}
-[System.Serializable]
-public class InGameStatusResponse
-{
-    public int statusCode;
-    public int id;
-    public string firstUsername;
-    public string secondUsername;
-    public string status;
-}
-[System.Serializable]
-public class UserGameResultResponse
-{
-    public int statusCode;
-    public string username;
-    public int maxRound;
-    public int crystal;
-    public int numWins;
-}
-#endregion

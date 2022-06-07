@@ -181,6 +181,7 @@ public enum ENotiMessage
     InGameStartResponse,
     InGameFinishResponse,
     InGameBuildUpResponse,
+    TopTenUsersRankResponse,
 
     //Player Data관련
     UpdatePlayerDate,
@@ -199,4 +200,6 @@ public enum EDataParamKey
     //Response 관련
     InGameStatusResponse,
     InGameBuildUpResponse,
+    TopTenUsersRankResponse,
+    
 }
