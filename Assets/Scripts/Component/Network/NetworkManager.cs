@@ -160,6 +160,11 @@ public class NetworkManager : MonoBehaviour
         StartCoroutine(API_GetTopTenRanking());
     }
 
+    public void DeleteAllGame()
+    {
+        StartCoroutine(API_DeleteAllGames());
+    }
+
     public void GameResult(int round)
     {
         DisconnectSocket();
@@ -311,11 +316,6 @@ public class NetworkManager : MonoBehaviour
             if (request.isNetworkError || request.isHttpError)
             {
                 Debug.Log(request.error);
-            }
-            else
-            {
-                string json = JsonUtility.ToJson(request.downloadHandler.text); // 파일 다운로드
-                Debug.Log(json);
             }
         }
     }

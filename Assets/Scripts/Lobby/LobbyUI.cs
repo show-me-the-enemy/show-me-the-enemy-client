@@ -23,6 +23,7 @@ public class LobbyUI : MonoBehaviour,System.IDisposable
                             + " crystal : " + NetworkManager.Instance.Craystal
                             + " numWinds : " + NetworkManager.Instance.NumWins;
     }
+
     public void OnUpdateRanking(Notification noti)
     {
         string tempTxt = "";
@@ -41,6 +42,10 @@ public class LobbyUI : MonoBehaviour,System.IDisposable
     public void OnClick_JoinRoom()
     {
         NetworkManager.Instance.JoinRoom();
+    }
+    public void OnClick_DeletaAllGame()
+    {
+        NetworkManager.Instance.DeleteAllGame();
     }
 
     public void Dispose()

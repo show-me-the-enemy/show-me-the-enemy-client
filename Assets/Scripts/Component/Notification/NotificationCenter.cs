@@ -188,6 +188,7 @@ public enum ENotiMessage
 
     //ingame관련
     InGameFinished,
+    OnAddBuildUp,
 }
 
 public enum EDataParamKey

@@ -82,5 +82,10 @@ public class BuildupManager : MonoBehaviour
             accessories[idx].AddLevel();
         }
         isPurchase = true;
+
+        //옵저버 패턴으로 내가 구매하면 정보 보냄
+        Hashtable sendData = new Hashtable();
+        sendData.Add(EDataParamKey.Integer, idx);
+        NotificationCenter.Instance.PostNotification(ENotiMessage.OnAddBuildUp, sendData);
     }
 }
