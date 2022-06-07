@@ -10,11 +10,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
     #region lim
     public GameObject overPanel;
-    public GameObject buildupPanel;
-    private float roundStartTime;
-    public float roundLength = 30;
-    public float buildupLength = 10;
-    public UiBarView topBar;
+    public BuildupManager buildupManager;
+    public HudController hudController;
+    public InGameModel gameModel;
 
     #endregion
 
@@ -22,7 +20,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     {
         _app = app as InGameApplication;
         overPanel.SetActive(false);
-        buildupPanel.SetActive(false);
+        buildupManager.gameObject.SetActive(false);
+        gameModel.Init();
+        buildupManager.Init();
         InitHandlers();
 #if UNITY_EDITOR
         ChangeState(EInGameState.LOADING);
@@ -171,10 +171,13 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     }
     protected class StateHandlerBattle : IInGameStateHandler
     {
+        // 전체 플레이시간
         private float _currentPlayTime;
+        private float roundStartTime=0;
         private InGameController _controller;
         public void Init(InGameController controller)
         {
+            Debug.Log("battle init");
             _controller = controller;
             _currentPlayTime = 0;
             foreach (BaseElement.IBaseController ba in _controller._app.contollers)
@@ -199,6 +202,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 if (mob != null)
                     mob.Set();
             }
+
+            _controller.hudController.UpdateCoinBar(true);
+            roundStartTime = _currentPlayTime;
         }
 
         public void AdvanceTime(float dt_sec)
@@ -215,11 +221,12 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                     mob.AdvanceTime(dt_sec);
             }
 
-            float prg_t = _currentPlayTime - _controller.roundStartTime;
-            _controller.topBar.setValue(1 - prg_t / _controller.roundLength);
-            if (prg_t > _controller.roundLength)
+            float prg_t = _currentPlayTime - roundStartTime;
+            float percent = 1 - prg_t / _controller.gameModel.GetBattleTime();
+            _controller.hudController.SetTimeBar(percent, prg_t);
+            if(prg_t > _controller.gameModel.GetBattleTime())
             {
-                _controller.roundStartTime = _currentPlayTime;
+                _controller.gameModel.AddRound();
                 _controller.ChangeState(EInGameState.UPGRADE);
             }
         }
@@ -250,16 +257,20 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            _controller.buildupPanel.SetActive(true);
+            _controller.buildupManager.gameObject.SetActive(true);
+            _controller.buildupManager.updateItems();
             _currentUpgradeTime = 0;
+            _controller.hudController.UpdateCoinBar(false);
         }
 
         public void AdvanceTime(float dt_sec)
         {
             _currentUpgradeTime += dt_sec;
 
-            _controller.topBar.setValue(1 - _currentUpgradeTime / _controller.buildupLength);
-            if (_currentUpgradeTime > _controller.buildupLength)
+            float percent = 1 - _currentUpgradeTime / _controller.gameModel.GetBuildupTime();
+
+            _controller.hudController.SetTimeBar(percent, _currentUpgradeTime);
+            if (_currentUpgradeTime > _controller.gameModel.GetBuildupTime())
             {
                 _controller.ChangeState(EInGameState.BATTLE);
             }
@@ -267,7 +278,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Dispose()
         {
-            _controller.buildupPanel.SetActive(false);
+            _controller.buildupManager.gameObject.SetActive(false);
         }
 
     }

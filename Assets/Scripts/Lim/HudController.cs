@@ -5,10 +5,35 @@ using UnityEngine.UI;
 
 public class HudController : MonoBehaviour
 {
-    public Text coinText;
+    public UiBarView timeBar;
+    public UiBarView coinBar;
 
-    public void UpdateCoinText(int amount)
+    public Text coinText;
+    public Text coinCntText;
+    public InGameModel gameModel;
+
+    public void SetTimeBar(float percent, float prgTime)
     {
-       coinText.text = "Coin : "+amount;
+        timeBar.setValue(percent, prgTime);
+    }
+    public void UpdateCoinBar(bool showProgress = false)
+    {
+        int coin = gameModel.coinAmout;
+        coinText.text = "Coin: " + gameModel.coinAmout;
+
+        if (!showProgress) 
+        {
+            coinCntText.text = "";
+            coinBar.setValue(0);
+        }
+        else 
+        {
+            int itemPrice = gameModel.GetBuildupItemPrice();
+            int purchaseCount = coin / itemPrice;
+            int minCoin = coin - purchaseCount * itemPrice;
+            float percent = (float)minCoin/itemPrice;
+            coinCntText.text = purchaseCount+"";
+            coinBar.setValue(percent);
+        }
     }
 }
