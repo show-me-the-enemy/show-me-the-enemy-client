@@ -182,6 +182,9 @@ public enum ENotiMessage
     InGameFinishResponse,
     InGameBuildUpResponse,
 
+    //Player Data관련
+    UpdatePlayerDate,
+
     //ingame관련
     InGameFinished,
 }

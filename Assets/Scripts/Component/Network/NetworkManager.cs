@@ -115,6 +115,23 @@ public class NetworkManager : MonoBehaviour
 
     }
 
+    public void OnNotification(Notification noti)
+    {
+        if (noti.data[EDataParamKey.UserLoginRequest] != null)
+        {
+            UserLoginRequest request = noti.data[EDataParamKey.UserLoginRequest] as UserLoginRequest;
+            StartCoroutine(API_Login(request, (callback) =>
+            {
+                SceneManager.LoadScene("LobbyScene");
+            }));
+        }
+        else if (noti.data[EDataParamKey.UserSignUpRequest] != null)
+        {
+            UserSignUpRequest request = noti.data[EDataParamKey.UserSignUpRequest] as UserSignUpRequest;
+            StartCoroutine(API_SignUp(request));
+        }
+    }
+
     #region nomal function
     public void CreateRoom()
     {
@@ -157,23 +174,6 @@ public class NetworkManager : MonoBehaviour
          }));
     }
     #endregion
-
-    public void OnNotification(Notification noti)
-    {
-        if (noti.data[EDataParamKey.UserLoginRequest] != null)
-        {
-            UserLoginRequest request = noti.data[EDataParamKey.UserLoginRequest] as UserLoginRequest;
-            StartCoroutine(API_Login(request, (callback) =>
-            {
-                SceneManager.LoadScene("LobbyScene");
-            }));
-        }
-        else if (noti.data[EDataParamKey.UserSignUpRequest] != null)
-        {
-            UserSignUpRequest request = noti.data[EDataParamKey.UserSignUpRequest] as UserSignUpRequest;
-            StartCoroutine(API_SignUp(request));
-        }
-    }
 
     #region Login Register API
     IEnumerator API_SignUp(UserSignUpRequest userRequest)
@@ -383,38 +383,29 @@ public class NetworkManager : MonoBehaviour
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", "Bearer " + _accessToken);
             request.SetRequestHeader("Content-Type", "application/json");
 
             yield return request.SendWebRequest();
-            // 에러 발생 시
-            if (request.isNetworkError || request.isHttpError)
+
+            if (request.isNetworkError)
+            {
+                Debug.Log(request.error);
+            }
+            else if(request.isHttpError)
             {
                 Debug.Log(request.error);
             }
             else
             {
-                string json = JsonUtility.ToJson(request.downloadHandler.text); // 파일 다운로드
-                Debug.Log(json);
+                UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
+                string resJson = JsonUtility.ToJson(res);
+                _maxRound = res.maxRound;
+                _crystal = res.crystal;
+                _numWins = res.numWins;
+                NotificationCenter.Instance.PostNotification(ENotiMessage.UpdatePlayerDate);
+                Debug.Log(resJson);
             }
-
-            //request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-            //request.SetRequestHeader("Content-Type", "application/json");
-            //request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(""));
-            //yield return request.SendWebRequest();
-
-            //if (request.isNetworkError || request.isHttpError)
-            //{
-            //    Debug.LogError(request.error);
-            //    Debug.LogError(request.downloadHandler.text);
-            //}
-            //else
-            //{
-            //    UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
-            //    string resJson = JsonUtility.ToJson(res);
-            //    _maxRound = res.maxRound;
-            //    _crystal = res.crystal;
-            //    _numWins = res.numWins;
-            //}
         }
     }
     #endregion

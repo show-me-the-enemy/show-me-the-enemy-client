@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LobbyUI : MonoBehaviour
+public class LobbyUI : MonoBehaviour,System.IDisposable
 {
     [SerializeField]
     private Text _txtTopBarName;
     public void Start()
     {
+        NotificationCenter.Instance.AddObserver(OnUpdatePlayerData, ENotiMessage.UpdatePlayerDate);
         NetworkManager.Instance.UpdateUserInfo();
-        _txtTopBarName.text = "USERNAME : "+NetworkManager.Instance.UserName 
-                            +" crystal : " + NetworkManager.Instance.Craystal
-                            +" numWinds : "+NetworkManager.Instance.NumWins;
     }
+
+    public void OnUpdatePlayerData(Notification noti)
+    {
+        _txtTopBarName.text = "USERNAME : " + NetworkManager.Instance.UserName
+                            + " crystal : " + NetworkManager.Instance.Craystal
+                            + " numWinds : " + NetworkManager.Instance.NumWins;
+    }
+
     public void OnClick_CreateRoom()
     {
         NetworkManager.Instance.CreateRoom();
@@ -21,5 +27,10 @@ public class LobbyUI : MonoBehaviour
     public void OnClick_JoinRoom()
     {
         NetworkManager.Instance.JoinRoom();
+    }
+
+    public void Dispose()
+    {
+        NotificationCenter.Instance.RemoveObserver(OnUpdatePlayerData, ENotiMessage.UpdatePlayerDate);
     }
 }
