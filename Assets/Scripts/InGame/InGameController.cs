@@ -1,31 +1,41 @@
-﻿using System;
+﻿//battle만 테스트할때
+//#define BATTLE_TEST
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 
 public class InGameController : BaseElement, BaseElement.IBaseController
 {
     private InGameApplication _app = new InGameApplication();
 
     #region lim
-    public GameObject overPanel;
+    public OverPopup overPopup;
     public BuildupManager buildupManager;
     public HudController hudController;
     public InGameModel gameModel;
-
+    public MobGenerator mobGenerator;
+    public List<Monster> monsters = new List<Monster>();
+    [HideInInspector]
+    public bool isWin = true;
+    [HideInInspector]
+    public string oppositeId = "";
     #endregion
 
     public void Init()
     {
         _app = app as InGameApplication;
-        overPanel.SetActive(false);
+        overPopup.gameObject.SetActive(false);
         buildupManager.gameObject.SetActive(false);
         gameModel.Init();
         buildupManager.Init();
+        isWin = true;
         InitHandlers();
-#if UNITY_EDITOR
-        ChangeState(EInGameState.LOADING);
+#if BATTLE_TEST
+        ChangeState(EInGameState.BATTLE);
 #else
         ChangeState(EInGameState.LOADING);
 #endif
@@ -70,7 +80,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         switch (noti.msg)
         {
             case ENotiMessage.InGameBuildUpResponse:
-
                 InGameBuildUpResponse buildUpRes = (InGameBuildUpResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
                 Debug.Log(buildUpRes);
                 //buildUpRes.numItem
@@ -79,12 +88,14 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 //buildUpRes.status
                 break;
             case ENotiMessage.InGameFinishResponse:
-                ChangeState(EInGameState.DEATH);
+                InGameStatusResponse statusRes = (InGameStatusResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
+                oppositeId = statusRes.secondUsername;
                 //statusRes.firstUsername
                 //statusRes.id
                 //statusRes.secondUsername
                 //statusRes.status
                 //statusRes.statusCode
+                ChangeState(EInGameState.DEATH);
                 break;
         }
     }
@@ -121,9 +132,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 leaveHandler.Dispose();
             }
             IInGameStateHandler enterHandler = GetStateHandler(_currentState);
-            Debug.LogError(enterHandler);
             if (enterHandler != null)
             {
+                Debug.LogError(enterHandler);
                 enterHandler.Set();
             }
         }
@@ -182,14 +193,13 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         private InGameController _controller;
         public void Init(InGameController controller)
         {
-            Debug.Log("battle init");
             _controller = controller;
             _currentPlayTime = 0;
             foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
                 if (ba != null) ba.Init();
             }
-            foreach (Monster mob in _controller._app.monsters)
+            foreach (Monster mob in _controller.monsters)
             {
                 if (mob != null)
                     mob.Init();
@@ -202,11 +212,20 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             {
                 if (ba != null) ba.Set();
             }
-            foreach (Monster mob in _controller._app.monsters)
+            foreach (Monster mob in _controller.monsters)
             {
                 if (mob != null)
                     mob.Set();
             }
+            Debug.Log("Start:"+_currentPlayTime);
+            MobGenerator mg = _controller.mobGenerator;
+
+            float bbt = _controller.gameModel.GetBattleTime();
+            mg.SetRoundTime(bbt);
+            int bt = (int)bbt;
+            mg.SetMobNum("Air", 3*bt);
+            mg.SetMobNum("Bat", 3*bt);
+            mg.SetMobNum("BatSmall", 3*bt);
 
             _controller.hudController.UpdateCoinBar(true);
             roundStartTime = _currentPlayTime;
@@ -225,7 +244,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             {
                 if (ba != null) ba.AdvanceTime(dt_sec);
             }
-            foreach (Monster mob in _controller._app.monsters)
+            foreach (Monster mob in _controller.monsters)
             {
                 if (mob != null)
                     mob.AdvanceTime(dt_sec);
@@ -233,7 +252,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
             float prg_t = _currentPlayTime - roundStartTime;
             float percent = 1 - prg_t / _controller.gameModel.GetBattleTime();
-            _controller.hudController.SetTimeBar(percent, prg_t);
+            float remainTime = _controller.gameModel.GetBattleTime() - prg_t;
+            _controller.hudController.SetTimeBar(percent, remainTime);
             if(prg_t > _controller.gameModel.GetBattleTime())
             {
                 _controller.gameModel.AddRound();
@@ -247,7 +267,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             {
                 if (ba != null) ba.Dispose();
             }
-            foreach (Monster mob in _controller._app.monsters)
+            foreach (Monster mob in _controller.monsters)
             {
                 if (mob != null)
                     mob.Dispose();
@@ -285,9 +305,23 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void OnNotification(Notification noti)
         {
-            int idx = (int)noti.data[EDataParamKey.Integer];
-            _itemList.Add(idx);//이런식으로 내가 업글한것들이 무엇인지 아이템이면 아이템에 몬스터면 몬스터 리스트에 저장
-            //or _monsterList.Add(idx);
+            if (noti.msg == ENotiMessage.OnAddBuildUp)
+            {
+                string type = (string)noti.data["purchase_type"];
+                string name = (string)noti.data["purchase_name"];
+                if(type == "monster")
+                {
+
+                }
+                else if(type == "weapon")
+                {
+
+                }
+                else if (type == "accessory")
+                {
+
+                }
+            }
         }
 
         public void AdvanceTime(float dt_sec)
@@ -295,10 +329,12 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _currentUpgradeTime += dt_sec;
 
             float percent = 1 - _currentUpgradeTime / _controller.gameModel.GetBuildupTime();
-
-            _controller.hudController.SetTimeBar(percent, _currentUpgradeTime);
+            float remainTime = _controller.gameModel.GetBuildupTime()-_currentUpgradeTime;
+            _controller.hudController.SetTimeBar(percent, remainTime);
             if (_currentUpgradeTime > _controller.gameModel.GetBuildupTime())
             {
+#if BATTLE_TEST
+#else
                 //배틀스테이트 가기전에 item,monster List에 저장해둔것들 보냄
                 foreach (var item in _itemList)
                 {
@@ -308,6 +344,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 {
                     NetworkManager.Instance.SendBuildUpMsg(monster, 0);
                 }
+#endif
                 _controller.ChangeState(EInGameState.BATTLE);
             }
         }
@@ -350,6 +387,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     protected class StateHandlerDeath : IInGameStateHandler
     {
         InGameController _controller;
+        const float duration = 5;
+        float progTime = 0;
         public void Init(InGameController controller)
         {
             _controller = controller;
@@ -357,8 +396,13 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            _controller.overPanel.SetActive(true);
-            NetworkManager.Instance.GameResult(5);
+            progTime = 0;
+            _controller.overPopup.gameObject.SetActive(true);
+            int round = _controller.gameModel.round;
+            bool isWin = _controller.isWin;
+            int crystal = (isWin) ? round * 100 : 100;
+            NetworkManager.Instance.GameResult(round, crystal);
+            _controller.overPopup.Set(isWin, _controller.oppositeId, round, crystal);
         }
 
         public void OnNotification(Notification noti)
@@ -368,6 +412,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void AdvanceTime(float dt_sec)
         {
+            progTime += dt_sec;
+            if(progTime > duration)
+                SceneManager.LoadScene("LobbyScene");
         }
 
         public void Dispose()

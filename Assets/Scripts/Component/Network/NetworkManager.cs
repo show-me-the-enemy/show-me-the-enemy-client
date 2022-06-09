@@ -165,22 +165,19 @@ public class NetworkManager : MonoBehaviour
         StartCoroutine(API_DeleteAllGames());
     }
 
-    public void GameResult(int round)
+    public void GameResult(int round, int crystal)
     {
         DisconnectSocket();
         UserGameResultRequest req = new UserGameResultRequest();
         req.username = _username;
         req.gameId = _currentRoomId;
         req.won = !_isIngameDie;
-        if (req.won)
-            req.crystal = 100;
-        else
-            req.crystal = 50;
+        req.crystal = crystal;
         req.numRound = round;
         Debug.LogError("GameResult");
         StartCoroutine(API_GameResult(req, () =>
          {
-             SceneManager.LoadScene("LobbyScene");
+             //SceneManager.LoadScene("LobbyScene");
          }));
     }
     #endregion

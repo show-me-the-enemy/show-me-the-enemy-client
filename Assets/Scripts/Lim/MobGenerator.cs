@@ -6,28 +6,32 @@ using System.Linq;
 public class MobGenerator : BaseElement, BaseElement.IBaseController
 {
     public Transform player;
-    public InGameApplication gameApp;
+    public InGameController gameCtrl;
     public CoinGenerator coinGenerator;
+    public List<string> mobNames = new List<string>();
     Dictionary<string, Monster> mobPrefabs = new Dictionary<string, Monster>();
-    public float genDelaySec = 0.1f;
+    Dictionary<string, int> mobMaxCount = new Dictionary<string, int>();
+    Dictionary<string, int> mobGenCount = new Dictionary<string, int>();
+
     private float progTime = 0f;
-    private int genMobCount = -1;
+    private float rountTime = 0f;
 
-    const float borderHalfWidth = 29.0f;
+    float borderHalfWidth = 29.0f;
+    float borderHalfHeight = 17.6f;
     const float distRange = 20.0f;
-    const float borderHalfHeight = 17.6f;
 
 
-    void genMonster()
+    void genMonster(string mobName)
     {
         // 임시
-        Monster mob = Instantiate(mobPrefabs.Values.ElementAt(Random.RandomRange(0, 3)), getRandomPosition(), Quaternion.identity);
+        Monster mob = Instantiate(mobPrefabs[mobName], getRandomPosition(), Quaternion.identity);
+        mob.gameCtrl = gameCtrl;
         mob.player = player;
         mob.coinGenerator = coinGenerator;
         //mob.speed = 5;
         mob.Init();
         mob.transform.parent = gameObject.transform;
-        gameApp.monsters.Add(mob);
+        gameCtrl.monsters.Add(mob);
     }
     public Vector2 getRandomPosition() {
         float px = player.position.x;
@@ -40,35 +44,55 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
 
     public void Init()
     {
-        mobPrefabs.Add("Air", Resources.Load<Monster>("Prefabs/Monsters/Air"));
-        mobPrefabs.Add("Bat", Resources.Load<Monster>("Prefabs/Monsters/Bat"));
-        mobPrefabs.Add("BatSmall", Resources.Load<Monster>("Prefabs/Monsters/BatSmall"));
-    }
+        Camera cam = Camera.main;
+        Vector2 hwh = cam.ScreenToWorldPoint(new Vector3(0, 0, cam.nearClipPlane));
+        borderHalfHeight = -hwh.y;
+        borderHalfWidth = -hwh.x;
+        Debug.Log(borderHalfWidth + "x" + borderHalfHeight);
+        foreach(string mn in mobNames)
+        {
+            mobPrefabs.Add(mn, Resources.Load<Monster>("Prefabs/Monsters/"+mn));
 
+            mobGenCount.Add(mn, 0);
+            mobMaxCount.Add(mn, 0);
+        }
+    }
     public void AdvanceTime(float dt_sec)
     {
-        if (genMobCount < 0)
-            return;
         progTime += dt_sec;
-        int curIndex = (int)(progTime / genDelaySec);
-
-        if(genMobCount < curIndex)
+        foreach (string key in mobNames)
         {
-           
-            genMobCount++;
-            genMonster();
+            int gc = mobGenCount[key];
+            int mc = mobMaxCount[key];
+            //Debug.Log(mc);
+            int targetCount = Mathf.CeilToInt(mc * progTime / rountTime);
+            if(gc < targetCount)
+            {
+                mobGenCount[key]++;
+                genMonster(key);
+            }
         }
     }
 
     public void Set()
     {
-        genMobCount = 0;
+        foreach(string key in mobNames)
+        {
+            mobGenCount[key] = 0;
+        }
         progTime = 0f;
+    }
+    public void SetRoundTime(float rt)
+    {
+        rountTime = rt;
+    }
+    public void SetMobNum(string name, int count)
+    {
+        mobMaxCount[name] = count;
     }
 
     public void Dispose()
     {
-        genMobCount = -1;
     }
 
     public void SetActive(bool flag)

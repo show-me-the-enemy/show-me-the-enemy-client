@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Monster : BaseElement, BaseElement.IBaseController
 {
+    public InGameController gameCtrl;
     public Transform player;
     public float speed = 5;
     public float hp = 10f;
@@ -31,15 +32,19 @@ public class Monster : BaseElement, BaseElement.IBaseController
     }
     public void AutoDestory()
     {
+        gameCtrl.monsters.Remove(this);
         Destroy(gameObject);
     }
     public void GetDamaged(float d)
     {
         if (isImmotal) return;
-        animator.SetTrigger("Damaged");
         hp -= d;
         if (hp < 0) Death();
-        else StartCoroutine(SetImmotal());
+        else
+        {
+            animator.SetTrigger("Damaged");
+            StartCoroutine(SetImmotal());
+        }
     }
     void Death()
     {
