@@ -25,6 +25,7 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
     {
         // 임시
         Monster mob = Instantiate(mobPrefabs[mobName], getRandomPosition(), Quaternion.identity);
+        mob.name = mobName;
         mob.gameCtrl = gameCtrl;
         mob.player = player;
         mob.coinGenerator = coinGenerator;
@@ -52,7 +53,7 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
         foreach(string mn in mobNames)
         {
             mobPrefabs.Add(mn, Resources.Load<Monster>("Prefabs/Monsters/"+mn));
-
+            gameCtrl.killMobCount.Add(mn, 0);
             mobGenCount.Add(mn, 0);
             mobMaxCount.Add(mn, 0);
         }

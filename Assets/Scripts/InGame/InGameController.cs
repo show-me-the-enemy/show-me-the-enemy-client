@@ -19,6 +19,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     public InGameModel gameModel;
     public MobGenerator mobGenerator;
     public List<Monster> monsters = new List<Monster>();
+
+    public Dictionary<string, int> killMobCount = new Dictionary<string, int>();
     [HideInInspector]
     public bool isWin = true;
     [HideInInspector]
@@ -218,8 +220,13 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                     mob.Set();
             }
             Debug.Log("Start:"+_currentPlayTime);
-            MobGenerator mg = _controller.mobGenerator;
 
+            foreach(string key in _controller.killMobCount.Keys)
+            {
+                _controller.killMobCount[key] = 0;
+            }
+
+            MobGenerator mg = _controller.mobGenerator;
             float bbt = _controller.gameModel.GetBattleTime();
             mg.SetRoundTime(bbt);
             int bt = (int)bbt;
