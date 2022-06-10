@@ -1,5 +1,5 @@
-﻿//battle만 테스트할때
-//#define BATTLE_TEST
+﻿// battle만 테스트할때
+#define BATTLE_TEST
 
 using System;
 using System.Collections;
@@ -221,11 +221,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             }
             Debug.Log("Start:"+_currentPlayTime);
 
-            foreach(string key in _controller.killMobCount.Keys)
-            {
-                _controller.killMobCount[key] = 0;
-            }
-
             MobGenerator mg = _controller.mobGenerator;
             float bbt = _controller.gameModel.GetBattleTime();
             mg.SetRoundTime(bbt);
@@ -233,6 +228,11 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             mg.SetMobNum("Air", 3*bt);
             mg.SetMobNum("Bat", 3*bt);
             mg.SetMobNum("BatSmall", 3*bt);
+
+            foreach (string key in _controller.killMobCount.Keys)
+            {
+                _controller.killMobCount[key] = 0;
+            }
 
             _controller.hudController.UpdateCoinBar(true);
             roundStartTime = _currentPlayTime;
@@ -340,24 +340,27 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _controller.hudController.SetTimeBar(percent, remainTime);
             if (_currentUpgradeTime > _controller.gameModel.GetBuildupTime())
             {
-#if BATTLE_TEST
-#else
-                //배틀스테이트 가기전에 item,monster List에 저장해둔것들 보냄
-                foreach (var item in _itemList)
-                {
-                    NetworkManager.Instance.SendBuildUpMsg(0, item);
-                }
-                foreach(var monster in _monsterList)
-                {
-                    NetworkManager.Instance.SendBuildUpMsg(monster, 0);
-                }
-#endif
                 _controller.ChangeState(EInGameState.BATTLE);
             }
         }
 
         public void Dispose()
         {
+#if BATTLE_TEST
+#else
+            if (_controller._currentState == EInGameState.BATTLE)
+            {
+                //배틀스테이트 가기전에 item,monster List에 저장해둔것들 보냄
+                foreach (var item in _itemList)
+                {
+                    NetworkManager.Instance.SendBuildUpMsg(0, item);
+                }
+                foreach (var monster in _monsterList)
+                {
+                    NetworkManager.Instance.SendBuildUpMsg(monster, 0);
+                }
+            }
+#endif
             //dispose할때 removeObserver해줘야함
             NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.OnAddBuildUp);
             if (_controller.buildupManager.isPurchase)
