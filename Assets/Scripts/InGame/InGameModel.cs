@@ -51,7 +51,7 @@ public class InGameModel : MonoBehaviour
     public void SaveCoin(int coins)
     {
         coinAmout += coins;
-        hudController.UpdateCoinBar(true);
+        hudController.UpdateCoinBar(coins<10000);
     }
     public void Init()
     {

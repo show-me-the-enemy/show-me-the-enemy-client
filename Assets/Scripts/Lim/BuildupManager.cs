@@ -33,20 +33,22 @@ public class BuildupManager : MonoBehaviour
         int nr_weapon = Random.Range(0, 4);
         int nr_accessory = 3 - nr_weapon;
         List<int> notOverlap = new List<int>();
-        for(int i = 0; i < nr_weapon; i++)
+        for (int i = 0; i < nr_weapon; i++)
         {
             int idx = Random.Range(0, max_weapon);
-            if(notOverlap.Contains(idx))
+            if (notOverlap.Contains(idx))
             {
                 i--;
                 continue;
             }
             notOverlap.Add(idx);
         }
-        foreach(int weapon_idx in notOverlap) {
+        foreach (int weapon_idx in notOverlap) {
             IWeapon w = weaponManager.GetWeapon(weapon_idx);
             weapons.Add(w);
-            buildupItems[item_idx++].SetItem(w.icon, gameModel.GetBuildupItemPrice(), w.title, w.getDiscription(), w.level == 0);
+            BuildupItem.ItemState itemState = (w.level == 0) ? BuildupItem.ItemState.NEW :
+                ((w.level == w.levelInfos.Length) ? BuildupItem.ItemState.MAX : BuildupItem.ItemState.UPGRADE);
+            buildupItems[item_idx++].SetItem(w.icon, gameModel.GetBuildupItemPrice(), w.title + ", Lv" + w.level + ".", w.getDiscription(), itemState);
         }
 
         notOverlap.Clear();
@@ -64,28 +66,56 @@ public class BuildupManager : MonoBehaviour
         {
             IAccessory a = accessoryManager.GetAccessory(accessory_idx);
             accessories.Add(a);
-            buildupItems[item_idx++].SetItem(a.icon, gameModel.GetBuildupItemPrice(), a.title, a.getDiscription(), a.level == 0);
+            BuildupItem.ItemState itemState = (a.level == 0) ? BuildupItem.ItemState.NEW :
+                ((a.level == a.levelInfos.Length) ? BuildupItem.ItemState.MAX : BuildupItem.ItemState.UPGRADE);
+            buildupItems[item_idx++].SetItem(a.icon, gameModel.GetBuildupItemPrice(), a.title + ", Lv" + a.level + ".", a.getDiscription(), itemState);
         }
     }
     public void ItemOnClick(int idx)
     {
         if (!gameModel.Purchase(gameModel.GetBuildupItemPrice())) return;
+
+        Hashtable sendData = new Hashtable();
+
         buildupItems[idx].SetPurchaseCompleted();
         if (idx < weapons.Count)
         {
-            int lev = weapons[idx].AddLevel();
-            if (lev == 1) player.AddWeapon(weapons[idx]);
+            IWeapon w = weapons[idx];
+            sendData.Add("purchase_type", "weapon");
+            sendData.Add("purchase_name", w.title);
+            int lev = w.AddLevel();
+            if (lev == 1) player.AddWeapon(w);
         }
         else
         {
             idx -= weapons.Count;
+            IAccessory a = accessories[idx];
+            sendData.Add("purchase_type", "accessory");
+            sendData.Add("purchase_name", a.title);
             accessories[idx].AddLevel();
         }
         isPurchase = true;
 
-        //옵저버 패턴으로 내가 구매하면 정보 보냄
+        
+        NotificationCenter.Instance.PostNotification(ENotiMessage.OnAddBuildUp, sendData);
+    }
+
+    public void AttackItemOnClick(int idx)
+    {
         Hashtable sendData = new Hashtable();
-        sendData.Add(EDataParamKey.Integer, idx);
+        sendData.Add("purchase_type", "monster");
+        if (idx == 0)
+        {
+            if (!gameModel.Purchase(5000)) return;
+            sendData.Add("purchase_name", "Bread");
+            Debug.Log("send bread gen");
+        }
+        else if(idx == 1)
+        {
+            if (!gameModel.Purchase(500)) return;
+            sendData.Add("purchase_name", "Air");
+            Debug.Log("send air gen");
+        }
         NotificationCenter.Instance.PostNotification(ENotiMessage.OnAddBuildUp, sendData);
     }
 }

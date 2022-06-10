@@ -12,7 +12,6 @@ public class InGameApplication : BaseApplication
     private InGameController _controller;
 
     public List<BaseElement> contollers;
-    public List<Monster> monsters = new List<Monster>();
 
     public InGameModel Model
     {

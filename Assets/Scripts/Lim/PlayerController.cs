@@ -12,7 +12,6 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     public HudController hudController;
     public WeaponManager weaponManager;
     public InGameModel gameModel;
-    [HideInInspector]
     public float speed;
     [HideInInspector]
     public float maxHp = 100f;
@@ -37,6 +36,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     }
     void Death()
     {
+        _game.isWin = false;
         NetworkManager.Instance.PlayerDie();
         hp = -1f;
         isImmotal = true;
@@ -77,6 +77,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
         IWeapon w = weaponManager.GetWeapon("Whip");
         w.AddLevel(); // 하면 무기에서 플레이어 참조해서 무기 추가해줌 쓰레기코드임.. ㅈㅅ
         AddWeapon(w);
+        hp = maxHp;
         rb = GetComponent<Rigidbody2D>();
     }
     public void AdvanceTime(float dt_sec)
@@ -113,7 +114,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     public void Set()
     {
         animator.enabled = true;
-        hp = maxHp;
+        //hp = maxHp;
         hpBar.setValue(hp / maxHp);
     }
     public void Dispose()

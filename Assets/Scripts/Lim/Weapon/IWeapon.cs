@@ -11,6 +11,7 @@ public abstract class IWeapon : MonoBehaviour
     public Sprite icon;
     [HideInInspector]
     public string title;
+    public int id;
 
 
     public abstract class ILevelInfo

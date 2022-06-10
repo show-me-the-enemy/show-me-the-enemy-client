@@ -14,6 +14,6 @@ public class UiBarView : MonoBehaviour
         value = v;
         fillRect.anchorMax = new Vector2(v,1);
         if (t < 0) return;
-        timeText.text = string.Format("{0:F2}", t);
+        timeText.text = string.Format("{0:F1}", t);
     }
 }
