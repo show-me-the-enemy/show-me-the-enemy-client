@@ -53,7 +53,6 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
         foreach(string mn in mobNames)
         {
             mobPrefabs.Add(mn, Resources.Load<Monster>("Prefabs/Monsters/"+mn));
-            gameCtrl.killMobCount.Add(mn, 0);
             mobGenCount.Add(mn, 0);
             mobMaxCount.Add(mn, 0);
         }

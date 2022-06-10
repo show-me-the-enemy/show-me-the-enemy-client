@@ -83,20 +83,14 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         {
             case ENotiMessage.InGameBuildUpResponse:
                 InGameBuildUpResponse buildUpRes = (InGameBuildUpResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
+                string type = buildUpRes.type;
+                string name = buildUpRes.name;
+                int count = buildUpRes.count;
                 Debug.Log(buildUpRes);
-                //buildUpRes.numItem
-                //buildUpRes.numMonsters
-                //buildUpRes.sender
-                //buildUpRes.status
                 break;
             case ENotiMessage.InGameFinishResponse:
                 InGameStatusResponse statusRes = (InGameStatusResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
                 oppositeId = statusRes.secondUsername;
-                //statusRes.firstUsername
-                //statusRes.id
-                //statusRes.secondUsername
-                //statusRes.status
-                //statusRes.statusCode
                 ChangeState(EInGameState.DEATH);
                 break;
         }
@@ -206,6 +200,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 if (mob != null)
                     mob.Init();
             }
+            foreach (string key in _controller.mobGenerator.mobNames)
+            {
+                _controller.killMobCount.Add(key, 0);
+            }
         }
 
         public void Set()
@@ -229,7 +227,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             mg.SetMobNum("Bat", 3*bt);
             mg.SetMobNum("BatSmall", 3*bt);
 
-            foreach (string key in _controller.killMobCount.Keys)
+            foreach (string key in _controller.mobGenerator.mobNames)
             {
                 _controller.killMobCount[key] = 0;
             }
@@ -289,9 +287,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         private InGameController _controller;
 
         //빌드업 MonstersList
-        private List<int> _monsterList = new List<int>();
-        //빌드업 ItemList
-        private List<int> _itemList = new List<int>();
+        private List<InGameBuildUpResponse> sendMsgs = new List<InGameBuildUpResponse>();
 
         public void Init(InGameController controller)
         {
@@ -300,8 +296,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            _monsterList.Clear();
-            _itemList.Clear();
+            sendMsgs.Clear();
             //옵저버 패턴으로 OnAddBuildUp으로 오는 메세지 구독
             NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.OnAddBuildUp);
             _controller.buildupManager.gameObject.SetActive(true);
@@ -316,18 +311,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             {
                 string type = (string)noti.data["purchase_type"];
                 string name = (string)noti.data["purchase_name"];
-                if(type == "monster")
-                {
-
-                }
-                else if(type == "weapon")
-                {
-
-                }
-                else if (type == "accessory")
-                {
-
-                }
+                InGameBuildUpResponse bur = new InGameBuildUpResponse();
+                bur.type = type; // monster, weapon, accessory
+                bur.name = name;
+                sendMsgs.Add(bur);
             }
         }
 
@@ -351,13 +338,16 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             if (_controller._currentState == EInGameState.BATTLE)
             {
                 //배틀스테이트 가기전에 item,monster List에 저장해둔것들 보냄
-                foreach (var item in _itemList)
+                foreach (InGameBuildUpResponse msg in sendMsgs)
                 {
-                    NetworkManager.Instance.SendBuildUpMsg(0, item);
+                    NetworkManager.Instance.SendBuildUpMsg(msg.type, msg.name, -1);
                 }
-                foreach (var monster in _monsterList)
+                foreach(string key in _controller.killMobCount.Keys)
                 {
-                    NetworkManager.Instance.SendBuildUpMsg(monster, 0);
+                    string type = "kill";
+                    string name = key;
+                    int count = _controller.killMobCount[key];
+                    NetworkManager.Instance.SendBuildUpMsg(type, name, count);
                 }
             }
 #endif
