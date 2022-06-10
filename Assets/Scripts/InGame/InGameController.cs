@@ -1,5 +1,5 @@
 ﻿// battle만 테스트할때
-#define BATTLE_TEST
+//#define BATTLE_TEST
 
 using System;
 using System.Collections;
