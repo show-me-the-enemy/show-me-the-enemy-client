@@ -340,7 +340,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _controller.hudController.SetTimeBar(percent, remainTime);
             if (_currentUpgradeTime > _controller.gameModel.GetBuildupTime())
             {
-                _controller.ChangeState(EInGameState.BATTLE);
+            _controller.ChangeState(EInGameState.BATTLE);
             }
         }
 
