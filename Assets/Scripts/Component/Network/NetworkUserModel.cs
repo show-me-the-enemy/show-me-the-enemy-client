@@ -27,8 +27,9 @@ public class InGameBuildUpRequest
 {
     public int id;
     public string sender;
-    public int numMonsters;
-    public int numItem;
+    public string type;
+    public string name;
+    public int count;
 }
 
 [System.Serializable]
@@ -66,8 +67,9 @@ public class InGameBuildUpResponse
 {
     public string sender;
     public string status;
-    public int numMonsters;
-    public int numItem;
+    public string type;
+    public string name;
+    public int count;
 }
 [System.Serializable]
 public class InGameStatusResponse

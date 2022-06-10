@@ -302,11 +302,11 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 //배틀스테이트 가기전에 item,monster List에 저장해둔것들 보냄
                 foreach (var item in _itemList)
                 {
-                    NetworkManager.Instance.SendBuildUpMsg(0, item);
+                    //NetworkManager.Instance.SendBuildUpMsg(0, item);
                 }
                 foreach(var monster in _monsterList)
                 {
-                    NetworkManager.Instance.SendBuildUpMsg(monster, 0);
+                    //NetworkManager.Instance.SendBuildUpMsg(monster, 0);
                 }
                 _controller.ChangeState(EInGameState.BATTLE);
             }

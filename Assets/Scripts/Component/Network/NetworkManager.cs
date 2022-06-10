@@ -550,10 +550,10 @@ public class NetworkManager : MonoBehaviour
         Debug.Log(DateTime.Now.ToString() + " ws_OnError says: " + e.Message);
     }
 
-    public void SendBuildUpMsg(int nMonsters, int nItem)
+    public void SendBuildUpMsg(string typeStr, string nameStr, int countInt)
     {
         StompMessageSerializer serializer = new StompMessageSerializer();
-        var request = new InGameBuildUpRequest() { id = _currentRoomId, sender = _username, numMonsters = nMonsters, numItem = nItem };
+        var request = new InGameBuildUpRequest() { id = _currentRoomId, sender = _username, type = typeStr,name = nameStr, count = countInt };
         var broad = new StompMessage("SEND", JsonUtility.ToJson(request));
         broad["content-type"] = "application/json";
         broad["destination"] = "/pub/build-up";
