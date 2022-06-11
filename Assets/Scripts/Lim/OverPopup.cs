@@ -16,9 +16,9 @@ public class OverPopup : MonoBehaviour
     {
         winImg.SetActive(isWin);
         loseImg.SetActive(!isWin);
-        titleT.text = isWin ? "You win!" : "You die";
+        titleT.text = isWin ? "You are winner!" : "You die, Cheers!\n";
         playerT.text = "opposite player: " + opId;
         roundT.text = "surviving round: " + round;
         crystalT.text = "acquired crystal: " + crystal;
-    } 
+    }
 }

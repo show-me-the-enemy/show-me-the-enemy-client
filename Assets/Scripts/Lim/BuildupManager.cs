@@ -9,6 +9,7 @@ public class BuildupManager : MonoBehaviour
     public BuildupItem[] buildupItems;
     public PlayerController player;
     public Text logText;
+    public Scrollbar scrollbar;
     List<string> logs = new List<string>();
     WeaponManager weaponManager;
     AccessoryManager accessoryManager;
@@ -109,6 +110,7 @@ public class BuildupManager : MonoBehaviour
     {
         string type, name="";
         type = "monster";
+        int count = 1;
         if (idx == 0)
         {
             if (!gameModel.Purchase(5000)) return;
@@ -119,11 +121,12 @@ public class BuildupManager : MonoBehaviour
         {
             if (!gameModel.Purchase(500)) return;
             name = "Air";
+            count = 2;
             Debug.Log("send air gen");
         }
 #if BATTLE_TEST
 #else
-        NetworkManager.Instance.SendBuildUpMsg(type, name, 0);
+        NetworkManager.Instance.SendBuildUpMsg(type, name, count);
 #endif
     }
 
@@ -131,5 +134,6 @@ public class BuildupManager : MonoBehaviour
     {
         logs.Add(log);
         logText.text = logText.text + log + "\n";
+        scrollbar.value = 1;
     }
 }

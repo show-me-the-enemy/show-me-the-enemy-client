@@ -28,6 +28,10 @@ public class LoginController : MonoBehaviour
     [SerializeField]
     private Button _signUpBtn;
 
+    public void Start()
+    {
+        Screen.SetResolution(1280, 720, false);
+    }
 
     public void OnClick_PopupActive(string input)
     {

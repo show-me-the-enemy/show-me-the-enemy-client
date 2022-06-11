@@ -37,7 +37,10 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     void Death()
     {
         _game.isWin = false;
+#if BATTLE_TEST
+#else
         NetworkManager.Instance.PlayerDie();
+#endif
         hp = -1f;
         isImmotal = true;
         rb.velocity = Vector2.zero;
@@ -52,6 +55,9 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     public void DeathEvent()
     {
         animator.enabled=false;
+#if BATTLE_TEST
+        _game.goDeath = true;
+#endif
     }
     IEnumerator SetImmotal()
     {

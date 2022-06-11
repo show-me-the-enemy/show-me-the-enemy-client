@@ -25,13 +25,19 @@ public class Fire : MonoBehaviour
 
     public void OnTriggerStay2D(Collider2D col)
     {
+        Debug.Log(col);
         if (col.tag == "Monster")
         {
             Monster mob = col.GetComponent<Monster>();
             mob.GetDamaged(damage);
             passCapacity--;
-            if(passCapacity <= 0)
+            if (passCapacity <= 0)
                 Destroy(gameObject);
+        }
+        if (col.tag == "Box")
+        {
+            GroundBox box = col.GetComponent<GroundBox>();
+            box.Open();
         }
     }
 }

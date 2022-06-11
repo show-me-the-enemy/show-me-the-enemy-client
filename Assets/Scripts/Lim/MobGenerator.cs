@@ -14,7 +14,7 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
     Dictionary<string, int> mobGenCount = new Dictionary<string, int>();
 
     private float progTime = 0f;
-    private float rountTime = 0f;
+    private float roundtTime = 0f;
 
     float borderHalfWidth = 29.0f;
     float borderHalfHeight = 17.6f;
@@ -55,7 +55,7 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
             mobGenCount.Add(mn, 0);
             mobMaxCount.Add(mn, 0);
             gameCtrl.killMobCount.Add(mn, 0);
-            gameCtrl.oppositeKMC.Add(mn, 0);
+            gameCtrl.addMobCount.Add(mn, 0);
         }
     }
     public void AdvanceTime(float dt_sec)
@@ -66,7 +66,7 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
             int gc = mobGenCount[key];
             int mc = mobMaxCount[key];
             //Debug.Log(mc);
-            int targetCount = Mathf.CeilToInt(mc * progTime / rountTime);
+            int targetCount = Mathf.CeilToInt(mc * progTime / roundtTime);
             if(gc < targetCount)
             {
                 mobGenCount[key]++;
@@ -85,7 +85,7 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
     }
     public void SetRoundTime(float rt)
     {
-        rountTime = rt;
+        roundtTime = rt;
     }
     public void SetMobNum(string name, int count)
     {
