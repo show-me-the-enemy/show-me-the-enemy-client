@@ -42,7 +42,6 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
         isImmotal = true;
         rb.velocity = Vector2.zero;
         animator.SetTrigger("Death");
-        Debug.LogError("Death Player");
     }
     public Vector2 GetDirection()
     {
@@ -114,7 +113,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     public void Set()
     {
         animator.enabled = true;
-        //hp = maxHp;
+        hp = maxHp;
         hpBar.setValue(hp / maxHp);
     }
     public void Dispose()

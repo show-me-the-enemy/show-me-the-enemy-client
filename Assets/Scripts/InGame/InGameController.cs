@@ -21,10 +21,13 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     public List<Monster> monsters = new List<Monster>();
 
     public Dictionary<string, int> killMobCount = new Dictionary<string, int>();
+    public Dictionary<string, int> oppositeKMC = new Dictionary<string, int>();
     [HideInInspector]
     public bool isWin = true;
     [HideInInspector]
     public string oppositeId = "";
+    [HideInInspector]
+    public string myId = "";
     #endregion
 
     public void Init()
@@ -42,7 +45,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         ChangeState(EInGameState.LOADING);
 #endif
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameStartResponse);
-        NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameFinishResponse);
         NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
     }
 
@@ -66,7 +68,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             GetStateHandler(_currentState).Dispose();
         }
 
-        NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.InGameFinishResponse);
         NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.InGameStartResponse);
         NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
     }
@@ -76,22 +77,49 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
     }
 
-    //이런식으로 받아서 사용하면 됌
     private void OnNotification(Notification noti)
     {
         switch (noti.msg)
         {
+            case ENotiMessage.InGameStartResponse:
+                break;
             case ENotiMessage.InGameBuildUpResponse:
                 InGameBuildUpResponse buildUpRes = (InGameBuildUpResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
+                string sender = buildUpRes.sender;
                 string type = buildUpRes.type;
                 string name = buildUpRes.name;
                 int count = buildUpRes.count;
-                Debug.Log(buildUpRes);
-                break;
-            case ENotiMessage.InGameFinishResponse:
-                InGameStatusResponse statusRes = (InGameStatusResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
-                oppositeId = statusRes.secondUsername;
-                ChangeState(EInGameState.DEATH);
+                string msg="";
+                if (sender == myId)
+                {
+                    switch (type)
+                    {
+                        case "monster":
+                            msg = "상대에게 " + name + "을 소환합니다.";
+                            break;
+                        case "weapon":
+                        case "accessory":
+                            msg = name + "을 구매했습니다.";
+                            break;
+                    }
+                } else
+                {
+                    switch (type)
+                    {
+                        case "monster":
+                            msg = "상대가 나에게 " + name + "을 소환했습니다.";
+                            break;
+                        case "kill":
+                            msg = "상대가 이번라우드에서 " + name + "을" + count + "마리 죽였습니다.";
+                            msg += "\n나에게 적이 " + (int)count / 4 + "마리 추가됩니다.";
+                            break;
+                        case "weapon":
+                        case "accessory":
+                            msg = "상대가" + name + "을 구매했습니다.";
+                            break;
+                    }
+                }
+                buildupManager.AddRogText(msg);
                 break;
         }
     }
@@ -172,11 +200,19 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             if (NetworkManager.Instance.IsGameReady)
             {
                 _controller.ChangeState(EInGameState.BATTLE); //배틀 스테이지로 넘어감
+            } else if(Input.GetKey(KeyCode.Escape))
+            {
+                // TODO: 방 끊기 코드 
+                SceneManager.LoadScene("LobbyScene");
             }
         }
 
         public void Dispose()
         {
+            _controller.myId = NetworkManager.Instance.UserName;
+            _controller.oppositeId = NetworkManager.Instance.SeccondUserName;
+            _controller.buildupManager.AddRogText(_controller.oppositeId + "와 연결됐다.");
+            Debug.Log(_controller.myId+"  "+ _controller.oppositeId);
             _controller._app.View.LoadingPopup.SetActive(false);
         }
 
@@ -187,6 +223,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         private float _currentPlayTime;
         private float roundStartTime=0;
         private InGameController _controller;
+        public bool goDeath = false;
         public void Init(InGameController controller)
         {
             _controller = controller;
@@ -200,10 +237,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 if (mob != null)
                     mob.Init();
             }
-            foreach (string key in _controller.mobGenerator.mobNames)
-            {
-                _controller.killMobCount.Add(key, 0);
-            }
+
         }
 
         public void Set()
@@ -217,28 +251,35 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 if (mob != null)
                     mob.Set();
             }
-            Debug.Log("Start:"+_currentPlayTime);
 
             MobGenerator mg = _controller.mobGenerator;
             float bbt = _controller.gameModel.GetBattleTime();
             mg.SetRoundTime(bbt);
             int bt = (int)bbt;
-            mg.SetMobNum("Air", 3*bt);
-            mg.SetMobNum("Bat", 3*bt);
-            mg.SetMobNum("BatSmall", 3*bt);
-
-            foreach (string key in _controller.mobGenerator.mobNames)
+            foreach(string name in mg.mobNames)
             {
-                _controller.killMobCount[key] = 0;
+                int genCount = 1 * bt + _controller.oppositeKMC[name] / 4;
+                mg.SetMobNum(name, genCount);
+                _controller.oppositeKMC[name] = 0;
+                _controller.killMobCount[name] = 0;
             }
 
             _controller.hudController.UpdateCoinBar(true);
             roundStartTime = _currentPlayTime;
+
+
+            NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameFinishResponse);
         }
 
         public void OnNotification(Notification noti)
         {
-
+            switch (noti.msg)
+            {
+                case ENotiMessage.InGameFinishResponse:
+                    Debug.Log("receive Death");
+                    goDeath = true;
+                    break;
+            }
         }
 
         public void AdvanceTime(float dt_sec)
@@ -264,9 +305,15 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 _controller.gameModel.AddRound();
                 _controller.ChangeState(EInGameState.UPGRADE);
             }
+            else if( goDeath)
+            {
+
+                _controller.ChangeState(EInGameState.DEATH);
+            }
         }
         public void Dispose()
         {
+            NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.InGameFinishResponse);
 
             foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
@@ -277,6 +324,19 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 if (mob != null)
                     mob.Dispose();
             }
+#if BATTLE_TEST
+#else
+            if (_controller._currentState == EInGameState.UPGRADE)
+            {
+                foreach (string key in _controller.killMobCount.Keys)
+                {
+                    string type = "kill";
+                    string name = key;
+                    int count = _controller.killMobCount[key];
+                    NetworkManager.Instance.SendBuildUpMsg(type, name, count);
+                }
+            }
+#endif
         }
 
     }
@@ -297,8 +357,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         public void Set()
         {
             sendMsgs.Clear();
-            //옵저버 패턴으로 OnAddBuildUp으로 오는 메세지 구독
-            NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.OnAddBuildUp);
             _controller.buildupManager.gameObject.SetActive(true);
             _controller.buildupManager.updateItems();
             _currentUpgradeTime = 0;
@@ -307,15 +365,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void OnNotification(Notification noti)
         {
-            if (noti.msg == ENotiMessage.OnAddBuildUp)
-            {
-                string type = (string)noti.data["purchase_type"];
-                string name = (string)noti.data["purchase_name"];
-                InGameBuildUpResponse bur = new InGameBuildUpResponse();
-                bur.type = type; // monster, weapon, accessory
-                bur.name = name;
-                sendMsgs.Add(bur);
-            }
         }
 
         public void AdvanceTime(float dt_sec)
@@ -327,32 +376,12 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _controller.hudController.SetTimeBar(percent, remainTime);
             if (_currentUpgradeTime > _controller.gameModel.GetBuildupTime())
             {
-            _controller.ChangeState(EInGameState.BATTLE);
+                _controller.ChangeState(EInGameState.BATTLE);
             }
         }
 
         public void Dispose()
         {
-#if BATTLE_TEST
-#else
-            if (_controller._currentState == EInGameState.BATTLE)
-            {
-                //배틀스테이트 가기전에 item,monster List에 저장해둔것들 보냄
-                foreach (InGameBuildUpResponse msg in sendMsgs)
-                {
-                    NetworkManager.Instance.SendBuildUpMsg(msg.type, msg.name, -1);
-                }
-                foreach(string key in _controller.killMobCount.Keys)
-                {
-                    string type = "kill";
-                    string name = key;
-                    int count = _controller.killMobCount[key];
-                    NetworkManager.Instance.SendBuildUpMsg(type, name, count);
-                }
-            }
-#endif
-            //dispose할때 removeObserver해줘야함
-            NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.OnAddBuildUp);
             if (_controller.buildupManager.isPurchase)
                 _controller.gameModel.AddBuyLevel();
             _controller.buildupManager.gameObject.SetActive(false);
@@ -396,6 +425,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
+            Debug.Log("change death");
             progTime = 0;
             _controller.overPopup.gameObject.SetActive(true);
             int round = _controller.gameModel.round;

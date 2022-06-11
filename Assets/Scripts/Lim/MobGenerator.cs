@@ -49,12 +49,13 @@ public class MobGenerator : BaseElement, BaseElement.IBaseController
         Vector2 hwh = cam.ScreenToWorldPoint(new Vector3(0, 0, cam.nearClipPlane));
         borderHalfHeight = -hwh.y;
         borderHalfWidth = -hwh.x;
-        Debug.Log(borderHalfWidth + "x" + borderHalfHeight);
         foreach(string mn in mobNames)
         {
             mobPrefabs.Add(mn, Resources.Load<Monster>("Prefabs/Monsters/"+mn));
             mobGenCount.Add(mn, 0);
             mobMaxCount.Add(mn, 0);
+            gameCtrl.killMobCount.Add(mn, 0);
+            gameCtrl.oppositeKMC.Add(mn, 0);
         }
     }
     public void AdvanceTime(float dt_sec)

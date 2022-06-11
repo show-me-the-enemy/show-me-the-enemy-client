@@ -1,14 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BuildupManager : MonoBehaviour
 {
     public InGameModel gameModel;
     public BuildupItem[] buildupItems;
     public PlayerController player;
+    public Text logText;
+    List<string> logs = new List<string>();
     WeaponManager weaponManager;
     AccessoryManager accessoryManager;
+    [HideInInspector]
     public bool isPurchase = false;
 
     List<IWeapon> weapons = new List<IWeapon>();
@@ -74,15 +78,14 @@ public class BuildupManager : MonoBehaviour
     public void ItemOnClick(int idx)
     {
         if (!gameModel.Purchase(gameModel.GetBuildupItemPrice())) return;
-
-        Hashtable sendData = new Hashtable();
+        string type, name;
 
         buildupItems[idx].SetPurchaseCompleted();
         if (idx < weapons.Count)
         {
             IWeapon w = weapons[idx];
-            sendData.Add("purchase_type", "weapon");
-            sendData.Add("purchase_name", w.title);
+            type = "weapon";
+            name = w.title;
             int lev = w.AddLevel();
             if (lev == 1) player.AddWeapon(w);
         }
@@ -90,32 +93,43 @@ public class BuildupManager : MonoBehaviour
         {
             idx -= weapons.Count;
             IAccessory a = accessories[idx];
-            sendData.Add("purchase_type", "accessory");
-            sendData.Add("purchase_name", a.title);
+            type = "accessory";
+            name = a.title;
             accessories[idx].AddLevel();
         }
         isPurchase = true;
 
-        
-        NotificationCenter.Instance.PostNotification(ENotiMessage.OnAddBuildUp, sendData);
+#if BATTLE_TEST
+#else
+        NetworkManager.Instance.SendBuildUpMsg(type, name, 0);
+#endif
     }
 
     public void AttackItemOnClick(int idx)
     {
-        Hashtable sendData = new Hashtable();
-        sendData.Add("purchase_type", "monster");
+        string type, name="";
+        type = "monster";
         if (idx == 0)
         {
             if (!gameModel.Purchase(5000)) return;
-            sendData.Add("purchase_name", "Bread");
+            name = "Bread";
             Debug.Log("send bread gen");
         }
         else if(idx == 1)
         {
             if (!gameModel.Purchase(500)) return;
-            sendData.Add("purchase_name", "Air");
+            name = "Air";
             Debug.Log("send air gen");
         }
-        NotificationCenter.Instance.PostNotification(ENotiMessage.OnAddBuildUp, sendData);
+#if BATTLE_TEST
+#else
+        NetworkManager.Instance.SendBuildUpMsg(type, name, 0);
+#endif
+    }
+
+    public void AddRogText(string log)
+    {
+        logs.Add(log);
+        logText.text = logText.text + log + "\n";
     }
 }

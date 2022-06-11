@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class OverPopup : MonoBehaviour
 {
+    public GameObject winImg;
+    public GameObject loseImg;
     public Text titleT;
     public Text playerT;
     public Text roundT;
@@ -12,7 +14,9 @@ public class OverPopup : MonoBehaviour
 
     public void Set(bool isWin, string opId, int round, int crystal)
     {
-        titleT.text = isWin ? "You survived" : "You die";
+        winImg.SetActive(isWin);
+        loseImg.SetActive(!isWin);
+        titleT.text = isWin ? "You win!" : "You die";
         playerT.text = "opposite player: " + opId;
         roundT.text = "surviving round: " + round;
         crystalT.text = "acquired crystal: " + crystal;

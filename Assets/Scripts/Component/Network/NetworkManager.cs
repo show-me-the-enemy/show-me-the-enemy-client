@@ -47,6 +47,14 @@ public class NetworkManager : MonoBehaviour
             return _username;
         }
     }
+    private string _seccondusername;
+    public string SeccondUserName
+    {
+        get
+        {
+            return _seccondusername;
+        }
+    }
     private string _password;
     public string Password
     {
@@ -178,6 +186,7 @@ public class NetworkManager : MonoBehaviour
         StartCoroutine(API_GameResult(req, () =>
          {
              //SceneManager.LoadScene("LobbyScene");
+             Debug.Log("Game Rsult send complete");
          }));
     }
     #endregion
@@ -293,6 +302,7 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log(res.id); Debug.Log(res.statusCode); Debug.Log(res.firstUsername); Debug.Log(res.secondUsername); Debug.Log(res.status);
                 _isGameReady = true;
                 _currentRoomId = res.id;
+                _seccondusername = res.firstUsername;
                 ConnectSocket();
                 SceneManager.LoadScene("SampleScene");
             }
@@ -345,12 +355,10 @@ public class NetworkManager : MonoBehaviour
     }
     IEnumerator API_GameResult(UserGameResultRequest userRequest, Action callback)
     {
-        Debug.LogError("a");
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users";
         string json = JsonUtility.ToJson(userRequest);
         using (UnityWebRequest request = UnityWebRequest.Put(url, json))
         {
-            Debug.LogError("b");
             byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(json);
             request.uploadHandler = new UploadHandlerRaw(jsonToSend);
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -359,7 +367,6 @@ public class NetworkManager : MonoBehaviour
 
             yield return request.SendWebRequest();
 
-            Debug.LogError("c");
             if (request.isNetworkError || request.isHttpError)
             {
                 Debug.LogError(request.error);
@@ -367,7 +374,6 @@ public class NetworkManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("d");
                 UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
                 string resJson = JsonUtility.ToJson(res);
                 Debug.Log(resJson);
@@ -381,7 +387,6 @@ public class NetworkManager : MonoBehaviour
     IEnumerator API_GetStatusInLobby()
     {
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users/lobby/" + _username;
-        Debug.Log(url);
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -406,7 +411,6 @@ public class NetworkManager : MonoBehaviour
                 _crystal = res.crystal;
                 _numWins = res.numWins;
                 NotificationCenter.Instance.PostNotification(ENotiMessage.UpdatePlayerDate);
-                Debug.Log(resJson);
             }
         }
     }
@@ -414,7 +418,6 @@ public class NetworkManager : MonoBehaviour
     IEnumerator API_GetTopTenRanking()
     {
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/users/rankings";
-        Debug.Log(url);
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -515,7 +518,8 @@ public class NetworkManager : MonoBehaviour
                 if (msg.Headers["game-status"] == "start")
                 {
                     _isGameReady = true;
-                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameStartResponse);
+                    InGameStatusResponse res = JsonUtility.FromJson<InGameStatusResponse>(msg.Body);
+                    _seccondusername = res.secondUsername;
                 }
                 else if (msg.Headers["game-status"] == "finish")
                 {
