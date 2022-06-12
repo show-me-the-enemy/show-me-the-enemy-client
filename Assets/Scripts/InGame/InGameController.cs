@@ -229,7 +229,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _controller.myId = NetworkManager.Instance.UserName;
             _controller.oppositeId = NetworkManager.Instance.SeccondUserName;
             _controller.buildupManager.AddRogText(_controller.oppositeId + "와 연결됐다.");
-            Debug.Log(_controller.myId+"  "+ _controller.oppositeId);
             _controller._app.View.LoadingPopup.SetActive(false);
         }
 
