@@ -12,9 +12,9 @@ public class GroundBox : MonoBehaviour
     public void Open()
     {
         if (isCrash) return;
-        
+        AudioManager.Instance.PlaySFX("Box");
         isCrash = true;
-        sr.DOFade(0, 0.2f).OnComplete(() =>
+        sr.DOFade(0, 0.2f).SetLink(gameObject).OnComplete(() =>
         {
             if (itemPrefab != null)
             {

@@ -46,7 +46,7 @@ public class LoginController : MonoBehaviour
     }
     public void Awake()
     {
-        AudioManager.Instance.PlayBGM("Lobby");
+        AudioManager.Instance.PlayBGM("Lobby", 0.7f);
         FindObjectOfType<Slider>().onValueChanged.AddListener(SetVolume);
         FindObjectOfType<Dropdown>().onValueChanged.AddListener(SetResol);
     }

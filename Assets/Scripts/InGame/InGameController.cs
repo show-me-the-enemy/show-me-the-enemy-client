@@ -175,7 +175,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             IInGameStateHandler enterHandler = GetStateHandler(_currentState);
             if (enterHandler != null)
             {
-                Debug.LogError(enterHandler);
+                Debug.Log("Change state to "+enterHandler);
                 enterHandler.Set();
             }
         }
@@ -258,7 +258,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            AudioManager.Instance.PlayBGM("Battle" + Random.Range(1, 4));
+            AudioManager.Instance.PlayBGM("Battle" + Random.Range(1, 4), 0.7f);
 
             foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
@@ -370,7 +370,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            AudioManager.Instance.PlayBGM("Buildup");
+            AudioManager.Instance.PlayBGM("Buildup", 0.7f);
             sendMsgs.Clear();
             _controller.buildupManager.gameObject.SetActive(true);
             _controller.buildupManager.updateItems();

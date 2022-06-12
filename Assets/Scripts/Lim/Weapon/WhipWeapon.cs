@@ -30,6 +30,7 @@ public class WhipWeapon : IWeapon
 
     public override void Attack()
     {
+        AudioManager.Instance.PlaySFX("Whip");
         Vector3 firePos = new Vector3(player.position.x + player.localScale.x * fireOffset.x,
             player.position.y + fireOffset.y, player.position.z);
 

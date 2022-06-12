@@ -40,6 +40,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     public void GetDamaged(float d)
     {
         if (isImmotal || hp < 0) return;
+        AudioManager.Instance.PlaySFX("PDeath");
         animator.SetTrigger("Damaged");
         hp -= defensive*d;
         hpBar.setValue(hp / maxHp);
@@ -51,6 +52,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
         _game.isWin = false;
 #if BATTLE_TEST
 #else
+        Debug.Log("Send Die");
         NetworkManager.Instance.PlayerDie();
 #endif
         hp = -1f;
@@ -139,7 +141,9 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
         {
             string action = w.AtUpdate(dt_sec);
             if (action.Length > 0)
+            {
                 animator.SetTrigger(action);
+            }
         }
     }
     public void Set()

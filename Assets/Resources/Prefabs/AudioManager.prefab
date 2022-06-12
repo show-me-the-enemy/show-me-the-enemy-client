@@ -61,7 +61,7 @@ MonoBehaviour:
   - name: OverLose
     clip: {fileID: 8300000, guid: 16e7ae77b0bb02444bb9cf9da8ddaad9, type: 3}
   sfxs:
-  - name: Coin
+  - name: Coin1
     clip: {fileID: 8300000, guid: e887bfebef6ab8841a9892b7789ead4f, type: 3}
   - name: Hit1
     clip: {fileID: 8300000, guid: c5830b030ba691e4495057221d9f8e78, type: 3}
@@ -76,12 +76,20 @@ MonoBehaviour:
   - name: MDeath2
     clip: {fileID: 8300000, guid: 869a9ea4174138d4f96509f92a092fb4, type: 3}
   - name: MDeath3
-    clip: {fileID: 8300000, guid: 869a9ea4174138d4f96509f92a092fb4, type: 3}
+    clip: {fileID: 8300000, guid: 187c71bbd2073524081d5c83338f2555, type: 3}
   - name: Immotal
     clip: {fileID: 8300000, guid: f3c0f1b78f34c9f49b5678e71e485731, type: 3}
   - name: Hp
     clip: {fileID: 8300000, guid: d9fc247968203ce4cbea5c945ecc7b0d, type: 3}
   - name: Magnet
-    clip: {fileID: 8300000, guid: 5dc569bebcc67684dae6eb361527e054, type: 3}
+    clip: {fileID: 8300000, guid: ab5b9f93fcc582d43a203422bcbcebce, type: 3}
+  - name: Whip
+    clip: {fileID: 8300000, guid: 8b0e11660e92685419128d492e8efd0d, type: 3}
+  - name: Coin2
+    clip: {fileID: 8300000, guid: fc0f6a8657644114d9b394b0cddd8966, type: 3}
+  - name: Coin3
+    clip: {fileID: 8300000, guid: 9781c295c9b1db54cbba43efaa9f8386, type: 3}
+  - name: Box
+    clip: {fileID: 8300000, guid: 9b5f922b2e5ad214884dec4445a44b57, type: 3}
   playingSfxNames: []
   sfxBufferSize: 9

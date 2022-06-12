@@ -32,6 +32,7 @@ public class DaggerWeapon : IWeapon
 
     public override void Attack()
     {
+        AudioManager.Instance.PlaySFX("Hit1");
         Vector2 pp = player.position;
         Vector2 pd = player.GetComponent<PlayerController>().GetDirection();
         pd *= fireOffset;

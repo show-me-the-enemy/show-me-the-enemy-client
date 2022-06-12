@@ -61,7 +61,7 @@ public class AudioManager : MonoBehaviour
         playingSfxNames = new string[sfxs.Length];
     }
 
-    public void PlaySFX(string name)
+    public void PlaySFX(string name, float v=1)
     {
         for (int i = 0; i < sfxs.Length; i++)
         {
@@ -71,6 +71,7 @@ public class AudioManager : MonoBehaviour
                 {
                     if (!sfxASs[j].isPlaying)
                     {
+                        sfxASs[j].volume = v;
                         sfxASs[j].clip = sfxs[i].clip;
                         sfxASs[j].Play();
                         playingSfxNames[j] = sfxs[i].name;
@@ -83,8 +84,9 @@ public class AudioManager : MonoBehaviour
         }
         Debug.Log(name+ " is not registered.");
     }
-    public void PlayBGM(string name)
+    public void PlayBGM(string name, float v=1)
     {
+        bgmAS.volume = v;
         for (int i = 0; i < bgms.Length; i++)
         {
             if (name == bgms[i].name)

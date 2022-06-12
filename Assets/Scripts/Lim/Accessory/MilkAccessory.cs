@@ -22,7 +22,7 @@ public class MilkAccessory : IAccessory
         int idx = (level < levelInfos.Length) ? level - 1 : levelInfos.Length - 1;
         MlikLevelInfo gli = (MlikLevelInfo)levelInfos[idx];
         maxHP = gli.maxHP;
-        player.defensive = maxHP;
+        player.maxHp = maxHP;
     }
 
     public override void LevelInfoSetup()

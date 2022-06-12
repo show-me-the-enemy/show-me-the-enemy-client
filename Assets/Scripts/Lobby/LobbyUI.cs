@@ -13,9 +13,12 @@ public class LobbyUI : MonoBehaviour,System.IDisposable
     {
         NotificationCenter.Instance.AddObserver(OnUpdatePlayerData, ENotiMessage.UpdatePlayerDate);
         NotificationCenter.Instance.AddObserver(OnUpdateRanking, ENotiMessage.TopTenUsersRankResponse);
+#if BATTLE_TEST
+#else
         NetworkManager.Instance.GetTopTenRaking();
         NetworkManager.Instance.UpdateUserInfo();
-        AudioManager.Instance.PlayBGM("Main");
+#endif
+        AudioManager.Instance.PlayBGM("Main",0.7f);
     }
 
     public void OnUpdatePlayerData(Notification noti)

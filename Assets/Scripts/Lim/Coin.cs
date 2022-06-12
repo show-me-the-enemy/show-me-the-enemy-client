@@ -34,6 +34,7 @@ public class Coin : MonoBehaviour
     }
     public int GetCoin()
     {
+        AudioManager.Instance.PlaySFX("Coin" + Random.Range(1, 4));
         StopCoroutine(animRoutine());
         StartCoroutine(DestroyRoutine());
         return amount;

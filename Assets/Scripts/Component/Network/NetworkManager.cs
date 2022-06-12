@@ -272,7 +272,7 @@ public class NetworkManager : MonoBehaviour
             {
                 GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(request.downloadHandler.text);
                 string json = JsonUtility.ToJson(res);
-                Debug.Log(json);
+                Debug.Log("Room Create");
                 _isGameReady = false;
                 _currentRoomId = res.id;
                 ConnectSocket();
@@ -299,7 +299,7 @@ public class NetworkManager : MonoBehaviour
             else
             {
                 GameRoomResponse res = JsonUtility.FromJson<GameRoomResponse>(request.downloadHandler.text);
-                Debug.Log(res.id); Debug.Log(res.statusCode); Debug.Log(res.firstUsername); Debug.Log(res.secondUsername); Debug.Log(res.status);
+                //Debug.Log(res.id); Debug.Log(res.statusCode); Debug.Log(res.firstUsername); Debug.Log(res.secondUsername); Debug.Log(res.status);
                 _isGameReady = true;
                 _currentRoomId = res.id;
                 _seccondusername = res.firstUsername;
@@ -312,7 +312,7 @@ public class NetworkManager : MonoBehaviour
     IEnumerator API_DeleteAllGames()
     {
         string url = "http://ec2-3-37-203-23.ap-northeast-2.compute.amazonaws.com:8080/api/games";
-        Debug.Log(url);
+        Debug.Log("DeleteAllGame");
         using (UnityWebRequest request = UnityWebRequest.Delete(url))
         {
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -376,7 +376,7 @@ public class NetworkManager : MonoBehaviour
             {
                 UserGameResultResponse res = JsonUtility.FromJson<UserGameResultResponse>(request.downloadHandler.text);
                 string resJson = JsonUtility.ToJson(res);
-                Debug.Log(resJson);
+                //Debug.Log(resJson);
                 callback();
             }
         }
@@ -512,7 +512,6 @@ public class NetworkManager : MonoBehaviour
         switch (msg.Command)
         {
             case "CONNECTED":
-                Debug.Log(msg.Body);
                 break;
             case "MESSAGE":
                 if (msg.Headers["game-status"] == "start")

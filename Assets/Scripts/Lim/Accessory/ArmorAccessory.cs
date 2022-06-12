@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ArmorAccessory : IAccessory
 {
-    float defensive = 1.0f;
     public class ArmorLevelInfo : ILevelInfo
     {
         public float defensive = 1.0f;
@@ -21,8 +20,8 @@ public class ArmorAccessory : IAccessory
         level++;
         int idx = (level < levelInfos.Length) ? level - 1 : levelInfos.Length - 1;
         ArmorLevelInfo gli = (ArmorLevelInfo)levelInfos[idx];
-        defensive = gli.defensive;
-        player.defensive = defensive;
+        Debug.Log("deffeicsive" + gli.defensive);
+        player.defensive = gli.defensive;
     }
 
     public override void LevelInfoSetup()
