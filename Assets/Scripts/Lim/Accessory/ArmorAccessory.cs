@@ -20,7 +20,6 @@ public class ArmorAccessory : IAccessory
         level++;
         int idx = (level < levelInfos.Length) ? level - 1 : levelInfos.Length - 1;
         ArmorLevelInfo gli = (ArmorLevelInfo)levelInfos[idx];
-        Debug.Log("deffeicsive" + gli.defensive);
         player.defensive = gli.defensive;
     }
 

@@ -28,6 +28,11 @@ PrefabInstance:
       propertyPath: attackTime
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 3130791795338939503, guid: aae51090775490944968ee4a27bde862,
+        type: 3}
+      propertyPath: coinAmount
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 4872450301004358611, guid: aae51090775490944968ee4a27bde862,
         type: 3}
       propertyPath: m_RootOrder

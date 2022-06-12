@@ -75,12 +75,28 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     }
     public void SetItemImmotal()
     {
-        if(isImmotal) StopCoroutine(SetImmotal(defaultImmotalTime));
+        if (isImmotal)
+        {
+            StopCoroutine(SetImmotal(defaultImmotalTime));
+            GetComponent<SpriteRenderer>().DOKill();
+        }
         isImmotal = true;
         GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 0, 1), itemImmotalTime).SetEase(Ease.Flash, itemImmotalTime * 10).OnComplete(() =>
         {
             isImmotal = false;
         });
+    }
+    public void ToggleCheatImmotal()
+    {
+        isImmotal = !isImmotal;
+        if(isImmotal)
+            GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 0, 1), 120).SetEase(Ease.Flash, 120*10);
+        else
+        {
+            StopCoroutine(SetImmotal(defaultImmotalTime));
+            GetComponent<SpriteRenderer>().DOKill();
+            GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+        }
     }
     IEnumerator SetImmotal(float sec)
     {

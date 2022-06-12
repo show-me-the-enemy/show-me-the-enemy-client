@@ -82,6 +82,11 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 5158596327820846374, guid: 2f108148ade80324bbdbeb24b99a5072,
+        type: 3}
+      propertyPath: coinAmount
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 8542433914847910044, guid: 2f108148ade80324bbdbeb24b99a5072,
         type: 3}
       propertyPath: m_Sprite

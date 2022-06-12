@@ -30,7 +30,7 @@ public class Coin : MonoBehaviour
     {
         Vector2 pos = transform.position;
         float dist = (pos - playerPos).sqrMagnitude;
-        transform.DOMove(playerPos, 0.5f);
+        transform.DOMove(playerPos, 0.5f).SetLink(gameObject);
     }
     public int GetCoin()
     {

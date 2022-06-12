@@ -11,6 +11,12 @@ public class LoginController : MonoBehaviour
     private GameObject _loginPopup;
     [SerializeField]
     private GameObject _signupPopup;
+    [SerializeField]
+    private GameObject _storyPopup;
+    [SerializeField]
+    private GameObject _helpPopup;
+    [SerializeField]
+    private GameObject _memPopup;
 
     [SerializeField]
     private InputField _usernameInputLogin;
@@ -91,6 +97,9 @@ public class LoginController : MonoBehaviour
     {
         _loginPopup.SetActive(false);
         _signupPopup.SetActive(false);
+        _storyPopup.SetActive(false);
+        _helpPopup.SetActive(false);
+        _memPopup.SetActive(false);
     }
 
     public void SetVolume(float value)

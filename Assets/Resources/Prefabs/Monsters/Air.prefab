@@ -105,6 +105,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc8f3a37ab1f9b247beb55b2b4867dea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mobName: 
+  gameCtrl: {fileID: 0}
   player: {fileID: 0}
   speed: 2.4
   hp: 20
@@ -114,7 +116,7 @@ MonoBehaviour:
   attackTime: 0.1
   damage: 10
   coinGenerator: {fileID: 0}
-  coinAmount: 100
+  coinAmount: 400
 --- !u!212 &1903079707659055573
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -9,7 +9,7 @@ public class BuildupManager : MonoBehaviour
     public BuildupItem[] buildupItems;
     public PlayerController player;
     public Text logText;
-    public ScrollRect scrollRect;
+
     List<string> logs = new List<string>();
     WeaponManager weaponManager;
     AccessoryManager accessoryManager;
@@ -23,7 +23,6 @@ public class BuildupManager : MonoBehaviour
     {
         weaponManager = gameModel.weaponManager;
         accessoryManager = gameModel.accessoryManager;
-        scrollRect.verticalNormalizedPosition = 1;
     }
 
     public void updateItems()
@@ -133,6 +132,6 @@ public class BuildupManager : MonoBehaviour
 
     public void AddRogText(string log)
     {
-        logText.text = logText.text + log + "\n";
+        logText.text = log + "\n" + logText.text;
     }
 }

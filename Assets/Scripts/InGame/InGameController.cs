@@ -97,29 +97,29 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                     msg = name + "을 구매했습니다.";
                     break;
             }
+            if (msg != "") msg = "<color=cyan>" + msg + "</color>";
         }
         else
         {
             switch (type)
             {
                 case "monster":
-                    msg = "상대가 나에게 " + name + "을 소환했습니다.";
+                    msg = oppositeId + "가 나에게 " + name + "을 소환했습니다.";
                     addMobCount[name]+=count;
                     break;
                 case "kill":
-                    msg = "상대가 이번라우드에서 " + name + "을" + count + "마리 죽였습니다.";
-                    msg += " 나에게" + (int)count / 4 + "마리 추가됩니다.";
+                    msg = oppositeId+"가 " + name + "을 " + count + "마리 죽였습니다.";
                     addMobCount[name] += count / 4;
                     break;
                 case "weapon":
                 case "accessory":
-                    msg = "상대가" + name + "을 구매했습니다.";
+                    msg = oppositeId+"가" + name + "을 구매했습니다.";
                     break;
             }
+            if (msg != "") msg = "<color=magenta>" + msg + "</color>";
         }
         if (msg != "")
         {
-            buildupManager.AddRogText(sender + " " + type + " " + name);
             buildupManager.AddRogText(msg);
         }
     }
@@ -346,9 +346,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             {
                 foreach (string key in _controller.mobGenerator.mobNames)
                 {
+                    int count = _controller.killMobCount[key];
+                    if(count==0) continue;
                     string type = "kill";
                     string name = key;
-                    int count = _controller.killMobCount[key];
                     NetworkManager.Instance.SendBuildUpMsg(type, name, count);
                 }
             }
@@ -419,8 +420,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 {
                     _controller.ChangeState(EInGameState.BATTLE);
                 }
-                else if(imFinish)
+                else if(!imFinish)
                 {
+                    imFinish = true;
                     NetworkManager.Instance.SendBuildUpMsg("Finish", "", 0);
                 }
             }
