@@ -9,12 +9,17 @@ public class HudController : MonoBehaviour
     public UiBarView coinBar;
 
     public Text coinText;
+    public Text roundText;
     public Text coinCntText;
     public InGameModel gameModel;
 
     public void SetTimeBar(float percent, float prgTime)
     {
         timeBar.setValue(percent, prgTime);
+    }
+    public void SetRound(int round)
+    {
+        roundText.text = "Round "+round;
     }
     public void UpdateCoinBar(bool showProgress = false)
     {

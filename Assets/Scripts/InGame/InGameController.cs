@@ -262,6 +262,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         {
             AudioManager.Instance.PlayBGM("Battle" + Random.Range(1, 4), 0.7f);
 
+            _controller.gameModel.AddRound();
             foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
                 if (ba != null) ba.Set();
@@ -319,7 +320,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _controller.hudController.SetTimeBar(percent, remainTime);
             if(prg_t > _controller.gameModel.GetBattleTime())
             {
-                _controller.gameModel.AddRound();
                 _controller.ChangeState(EInGameState.UPGRADE);
             }
             else if( _controller.goDeath)

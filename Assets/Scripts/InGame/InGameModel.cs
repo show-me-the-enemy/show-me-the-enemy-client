@@ -23,16 +23,16 @@ public class InGameModel : MonoBehaviour
     }
     public RoundInfo[] roundInfos;
 
-    public void AddRound() { round++; }
+    public void AddRound() { round++; hudController.SetRound(round); }
     public void AddBuyLevel() { buyLevel++; }
     public float GetBattleTime()
     {
-        int roundIdx = (round < roundInfos.Length - 1) ? round : roundInfos.Length - 1;
+        int roundIdx = (round < roundInfos.Length - 1) ? round-1 : roundInfos.Length - 1;
         return roundInfos[roundIdx].battleTime;
     }
     public float GetBuildupTime()
     {
-        int roundIdx = (round < roundInfos.Length - 1) ? round : roundInfos.Length - 1;
+        int roundIdx = (round < roundInfos.Length - 1) ? round-1 : roundInfos.Length - 1;
         return roundInfos[roundIdx].buildupTime;
     }
     public int GetBuildupItemPrice()
