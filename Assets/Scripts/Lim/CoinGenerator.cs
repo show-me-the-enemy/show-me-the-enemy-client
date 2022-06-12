@@ -13,7 +13,7 @@ public class CoinGenerator : MonoBehaviour
         coinPrefabs.Add("purple", Resources.Load<Coin>("Prefabs/Items/PurpleCoin"));
         coinPrefabs.Add("red", Resources.Load<Coin>("Prefabs/Items/RedCoin"));
     }
-    public void genCoin(Vector3 pos, int amount)
+    public void GenCoin(Vector3 pos, int amount)
     {
         string cName = "blue";
         if (amount < 150) cName = "blue";
@@ -24,5 +24,13 @@ public class CoinGenerator : MonoBehaviour
         Coin coin = Instantiate(coinPrefabs[cName], pos, Quaternion.identity);
         coin.amount = amount;
         coin.transform.parent = transform;
+    }
+    public void MoveCoins(Vector2 playerPos)
+    {
+        for(int i = 0; i < transform.childCount; i++)
+        {
+            Coin c = transform.GetChild(i).GetComponent<Coin>();
+            c.GoTo(playerPos);
+        }
     }
 }

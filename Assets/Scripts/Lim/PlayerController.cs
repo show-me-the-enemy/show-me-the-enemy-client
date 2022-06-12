@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerController : BaseElement, BaseElement.IBaseController
 {
@@ -11,6 +12,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     public UiBarView hpBar;
     public HudController hudController;
     public WeaponManager weaponManager;
+    public CoinGenerator coinGenerator;
     public InGameModel gameModel;
     public float speed;
     [HideInInspector]
@@ -22,9 +24,19 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     private List<IWeapon> weapons = new List<IWeapon>();
 
     private bool isImmotal = false;
-    public float immotalTime = 0.1f;
+    public float defaultImmotalTime = 0.1f;
+    public float itemImmotalTime = 6.0f;
 
 
+    public void Heal(int amount)
+    {
+        hp += amount;
+        if(hp > maxHp)hp = maxHp;
+    }
+    public void GetAllCoins()
+    {
+        coinGenerator.MoveCoins(transform.position);
+    }
     public void GetDamaged(float d)
     {
         if (isImmotal || hp < 0) return;
@@ -32,7 +44,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
         hp -= defensive*d;
         hpBar.setValue(hp / maxHp);
         if (hp < 0) Death();
-        else StartCoroutine(SetImmotal());
+        else StartCoroutine(SetImmotal(defaultImmotalTime));
     }
     void Death()
     {
@@ -59,18 +71,33 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
         _game.goDeath = true;
 #endif
     }
-    IEnumerator SetImmotal()
+    public void SetItemImmotal()
+    {
+        if(isImmotal) StopCoroutine(SetImmotal(defaultImmotalTime));
+        isImmotal = true;
+        GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 0, 1), itemImmotalTime).SetEase(Ease.Flash, itemImmotalTime * 10).OnComplete(() =>
+        {
+            isImmotal = false;
+        });
+    }
+    IEnumerator SetImmotal(float sec)
     {
         isImmotal = true;
-        yield return new WaitForSeconds(immotalTime);
+        yield return new WaitForSeconds(sec);
         isImmotal = false;
     }
     public void OnTriggerEnter2D(Collider2D col)
     {
+        Debug.Log(col);
         if (col.tag == "Coin")
         {
             Coin c = col.GetComponent<Coin>();
             gameModel.SaveCoin(c.GetCoin());
+        } 
+        else if (col.tag == "Item")
+        {
+            GroundItem item = col.GetComponent<GroundItem>();
+            item.UseItem(this);
         }
     }
     public void AddWeapon(IWeapon w)
@@ -126,7 +153,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     {
         animator.enabled = false;
         rb.velocity = Vector2.zero; 
-        StopCoroutine(SetImmotal());
+        StopCoroutine(SetImmotal(defaultImmotalTime));
     }
 
     public void SetActive(bool flag)

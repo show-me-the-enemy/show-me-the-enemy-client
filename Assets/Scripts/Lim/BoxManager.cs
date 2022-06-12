@@ -19,7 +19,7 @@ public class BoxManager : BaseElement, BaseElement.IBaseController
     float borderHalfHeight = 17.6f;
     const float distRange = 20.0f;
 
-    public Vector2 getRandomPosition(float playerX)
+    public Vector2 GetRandomPosition(float playerX)
     {
         float y = Random.Range(-borderHalfHeight, borderHalfHeight);
         float x = Random.Range(borderHalfWidth, borderHalfWidth + distRange);
@@ -46,14 +46,15 @@ public class BoxManager : BaseElement, BaseElement.IBaseController
     }
     public void GenBox(Vector2 playerPos)
     {
-        GroundBox box = Instantiate(boxPrefab, getRandomPosition(playerPos.x), Quaternion.identity);
-        box.itemPrefab = itemPrefabs[Random.Range(0, itemPrefabs.Count)];
+        GroundBox box = Instantiate(boxPrefab, GetRandomPosition(playerPos.x), Quaternion.identity);
+        int randIdx = Random.Range(0, itemPrefabs.Count);
+        box.itemPrefab = itemPrefabs[randIdx];
         box.transform.parent = gameObject.transform;
     }
 
     public void AdvanceTime(float dt_sec)
     {
-        Vector2 playerPos = player.transform.localPosition;
+        Vector2 playerPos = player.localPosition;
         if (maxMoveX < playerPos.x)
         {
             maxMoveX = playerPos.x;

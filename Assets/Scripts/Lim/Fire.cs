@@ -25,7 +25,6 @@ public class Fire : MonoBehaviour
 
     public void OnTriggerStay2D(Collider2D col)
     {
-        Debug.Log(col);
         if (col.tag == "Monster")
         {
             Monster mob = col.GetComponent<Monster>();

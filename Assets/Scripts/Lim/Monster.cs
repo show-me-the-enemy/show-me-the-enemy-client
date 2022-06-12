@@ -51,7 +51,7 @@ public class Monster : BaseElement, BaseElement.IBaseController
     {
         isImmotal = true;
         attackable = false;
-        coinGenerator.genCoin(transform.position, coinAmount);
+        coinGenerator.GenCoin(transform.position, coinAmount);
         hp = -1;
         rb.velocity = Vector2.zero;
         animator.SetTrigger("Death");

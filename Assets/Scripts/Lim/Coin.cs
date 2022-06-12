@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Coin : MonoBehaviour
 {
@@ -24,6 +25,12 @@ public class Coin : MonoBehaviour
     public void Start()
     {
         StartCoroutine(animRoutine());
+    }
+    public void GoTo(Vector2 playerPos)
+    {
+        Vector2 pos = transform.position;
+        float dist = (pos - playerPos).sqrMagnitude;
+        transform.DOMove(playerPos, 0.5f);
     }
     public int GetCoin()
     {
