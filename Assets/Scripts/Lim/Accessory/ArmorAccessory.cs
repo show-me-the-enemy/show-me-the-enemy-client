@@ -16,7 +16,6 @@ public class ArmorAccessory : IAccessory
     }
     public override void AddLevel()
     {
-        title = "Armor";
         level++;
         int idx = (level < levelInfos.Length) ? level - 1 : levelInfos.Length - 1;
         ArmorLevelInfo gli = (ArmorLevelInfo)levelInfos[idx];
@@ -25,6 +24,7 @@ public class ArmorAccessory : IAccessory
 
     public override void LevelInfoSetup()
     {
+        title = "Armor";
         levelInfos = new ILevelInfo[7];
         levelInfos[0] = new ArmorLevelInfo("It increases your defense", 0.97f);
         levelInfos[1] = new ArmorLevelInfo("It increases your defense", 0.94f);

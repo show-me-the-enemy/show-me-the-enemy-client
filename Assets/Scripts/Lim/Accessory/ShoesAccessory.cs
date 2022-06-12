@@ -17,7 +17,6 @@ public class ShoesAccessory : IAccessory
     }
     public override void AddLevel()
     {
-        title = "Shoes";
         level++;
         int idx = (level < levelInfos.Length) ? level - 1 : levelInfos.Length - 1;
         ShoesLevelInfo gli = (ShoesLevelInfo)levelInfos[idx];
@@ -27,6 +26,7 @@ public class ShoesAccessory : IAccessory
 
     public override void LevelInfoSetup()
     {
+        title = "Shoes";
         levelInfos = new ILevelInfo[7];
         levelInfos[0] = new ShoesLevelInfo("It increases your speed", 5f);
         levelInfos[1] = new ShoesLevelInfo("It increases your speed", 5.5f);

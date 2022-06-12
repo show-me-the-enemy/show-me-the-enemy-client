@@ -37,6 +37,7 @@ public class BuildupManager : MonoBehaviour
 
         int nr_weapon = Random.Range(0, 4);
         int nr_accessory = 3 - nr_weapon;
+
         List<int> notOverlap = new List<int>();
         for (int i = 0; i < nr_weapon; i++)
         {
@@ -44,9 +45,11 @@ public class BuildupManager : MonoBehaviour
             if (notOverlap.Contains(idx))
             {
                 i--;
-                continue;
             }
-            notOverlap.Add(idx);
+            else
+            {
+                notOverlap.Add(idx);
+            }
         }
         foreach (int weapon_idx in notOverlap) {
             IWeapon w = weaponManager.GetWeapon(weapon_idx);
@@ -63,9 +66,11 @@ public class BuildupManager : MonoBehaviour
             if (notOverlap.Contains(idx))
             {
                 i--;
-                continue;
             }
-            notOverlap.Add(idx);
+            else 
+            { 
+                notOverlap.Add(idx);
+            }
         }
         foreach (int accessory_idx in notOverlap)
         {

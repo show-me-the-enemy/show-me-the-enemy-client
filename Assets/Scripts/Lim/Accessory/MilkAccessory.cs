@@ -17,7 +17,6 @@ public class MilkAccessory : IAccessory
     }
     public override void AddLevel()
     {
-        title = "Milk";
         level++;
         int idx = (level < levelInfos.Length) ? level - 1 : levelInfos.Length - 1;
         MlikLevelInfo gli = (MlikLevelInfo)levelInfos[idx];
@@ -27,6 +26,7 @@ public class MilkAccessory : IAccessory
 
     public override void LevelInfoSetup()
     {
+        title = "Milk";
         levelInfos = new ILevelInfo[7];
         levelInfos[0] = new MlikLevelInfo("It increases your max hp", 110f);
         levelInfos[1] = new MlikLevelInfo("It increases your max hp", 120f);

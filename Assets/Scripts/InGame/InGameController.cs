@@ -329,8 +329,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         }
         public void Dispose()
         {
-            NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.InGameFinishResponse);
-
             foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
                 if (ba != null) ba.Dispose();

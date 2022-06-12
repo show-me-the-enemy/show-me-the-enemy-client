@@ -301,7 +301,7 @@ public class NetworkManager : MonoBehaviour
                 //Debug.Log(res.id); Debug.Log(res.statusCode); Debug.Log(res.firstUsername); Debug.Log(res.secondUsername); Debug.Log(res.status);
                 _isGameReady = true;
                 _currentRoomId = res.id;
-                _seccondusername = res.firstUsername;
+                _seccondusername = res.firstUsername; // 방주인
                 ConnectSocket();
                 SceneManager.LoadScene("SampleScene");
             }
@@ -501,6 +501,10 @@ public class NetworkManager : MonoBehaviour
     {
         Debug.Log(DateTime.Now.ToString() + " ws_OnOpen says: " + e.ToString());
     }
+    private void ws_OnError(object sender, ErrorEventArgs e)
+    {
+        Debug.Log(DateTime.Now.ToString() + " ws_OnError says: " + e.Message);
+    }
 
     private void ws_OnMessage(object sender, MessageEventArgs e)
     {
@@ -508,6 +512,7 @@ public class NetworkManager : MonoBehaviour
         StompMessageSerializer serializer = new StompMessageSerializer();
 
         var msg = serializer.Deserialize(e.Data);
+        Debug.Log("receive msg");
         switch (msg.Command)
         {
             case "CONNECTED":
@@ -517,7 +522,7 @@ public class NetworkManager : MonoBehaviour
                 {
                     _isGameReady = true;
                     InGameStatusResponse res = JsonUtility.FromJson<InGameStatusResponse>(msg.Body);
-                    _seccondusername = res.secondUsername;
+                    _seccondusername = res.secondUsername;//입장하는사람
                 }
                 else if (msg.Headers["game-status"] == "finish")
                 {
@@ -544,13 +549,10 @@ public class NetworkManager : MonoBehaviour
 
     }
 
-    private void ws_OnError(object sender, ErrorEventArgs e)
-    {
-        Debug.Log(DateTime.Now.ToString() + " ws_OnError says: " + e.Message);
-    }
 
     public void SendBuildUpMsg(string typeStr, string nameStr, int countInt)
     {
+        Debug.Log("send Build up msg," +typeStr+"/"+ nameStr + "/" + countInt);
         StompMessageSerializer serializer = new StompMessageSerializer();
         var request = new InGameBuildUpRequest() { id = _currentRoomId, sender = _username, type = typeStr,name = nameStr, count = countInt };
         var broad = new StompMessage("SEND", JsonUtility.ToJson(request));
