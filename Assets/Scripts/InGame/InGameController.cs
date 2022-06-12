@@ -104,7 +104,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             {
                 case "monster":
                     msg = "상대가 나에게 " + name + "을 소환했습니다.";
-                    addMobCount[name]=count;
+                    addMobCount[name]+=count;
                     break;
                 case "kill":
                     msg = "상대가 이번라우드에서 " + name + "을" + count + "마리 죽였습니다.";
@@ -361,6 +361,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     {
         private float _currentUpgradeTime = 0;
         private InGameController _controller;
+        private bool oppositeFinish = false;
+        private bool imFinish = false;
 
         //빌드업 MonstersList
         private List<InGameBuildUpResponse> sendMsgs = new List<InGameBuildUpResponse>();
@@ -372,16 +374,29 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
-            AudioManager.Instance.PlayBGM("Buildup", 0.7f);
+            AudioManager.Instance.PlayBGM("Buildup");
             sendMsgs.Clear();
             _controller.buildupManager.gameObject.SetActive(true);
             _controller.buildupManager.updateItems();
             _currentUpgradeTime = 0;
             _controller.hudController.UpdateCoinBar(false);
+            oppositeFinish = false;
+            imFinish = false;
+            NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
         }
 
         public void OnNotification(Notification noti)
         {
+            if(noti.msg==ENotiMessage.InGameBuildUpResponse)
+            {
+                InGameBuildUpResponse buildUpRes = (InGameBuildUpResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
+                string sender = buildUpRes.sender;
+                string type = buildUpRes.type;
+                if(sender == _controller.oppositeId && type == "Finish")
+                {
+                    oppositeFinish = true;
+                }
+            } 
         }
 
         public void AdvanceTime(float dt_sec)
@@ -391,11 +406,27 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             float percent = 1 - _currentUpgradeTime / _controller.gameModel.GetBuildupTime();
             float remainTime = _controller.gameModel.GetBuildupTime()-_currentUpgradeTime;
             _controller.hudController.SetTimeBar(percent, remainTime);
+
+#if BATTLE_TEST
             if (_currentUpgradeTime > _controller.gameModel.GetBuildupTime())
             {
                 _controller.ChangeState(EInGameState.BATTLE);
             }
-            else if(_controller.goDeath)
+#else
+            if (_currentUpgradeTime > _controller.gameModel.GetBuildupTime())
+            {
+                if (oppositeFinish && imFinish)
+                {
+                    _controller.ChangeState(EInGameState.BATTLE);
+                }
+                else if(imFinish)
+                {
+                    NetworkManager.Instance.SendBuildUpMsg("Finish", "", 0);
+                }
+            }
+#endif
+
+            else if (_controller.goDeath)
             {
                 _controller.ChangeState(EInGameState.DEATH);
             }
@@ -406,6 +437,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             if (_controller.buildupManager.isPurchase)
                 _controller.gameModel.AddBuyLevel();
             _controller.buildupManager.gameObject.SetActive(false);
+
+            NotificationCenter.Instance.RemoveObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
         }
 
     }

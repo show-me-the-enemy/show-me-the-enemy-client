@@ -43509,7 +43509,6 @@ MonoBehaviour:
   - {fileID: 1596813706}
   player: {fileID: 362337206}
   logText: {fileID: 1339478017}
-  scrollbar: {fileID: 733584601}
   isPurchase: 0
 --- !u!1 &1299200240
 GameObject:
@@ -46684,7 +46683,7 @@ MonoBehaviour:
   - Potion
   - Magnet
   - Immotal
-  genDist: 30
+  genDist: 20
 --- !u!1 &1860225258
 GameObject:
   m_ObjectHideFlags: 0
