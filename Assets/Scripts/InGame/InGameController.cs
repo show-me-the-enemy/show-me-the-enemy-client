@@ -393,6 +393,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 string type = buildUpRes.type;
                 if(sender == _controller.oppositeId && type == "Finish")
                 {
+                    _controller.buildupManager.AddRogText("sync with "+_controller.oppositeId);
                     oppositeFinish = true;
                 }
             } 
