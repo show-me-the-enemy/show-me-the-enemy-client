@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4141044050501651184
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4141044050501651186}
+  - component: {fileID: 4141044050501651187}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4141044050501651186
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4141044050501651184}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4141044050501651187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4141044050501651184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4595c9098e1366246ad8241b97319206, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgms:
+  - name: Lobby
+    clip: {fileID: 8300000, guid: 3a37077d7d6a8ef4b827e09b1be67ad9, type: 3}
+  - name: Main
+    clip: {fileID: 8300000, guid: 24c65eb114477a6498422a6cb677699f, type: 3}
+  - name: Buildup
+    clip: {fileID: 8300000, guid: 4ce19df9c84212a4488067f95fc99608, type: 3}
+  - name: Battle1
+    clip: {fileID: 8300000, guid: cefb326dcfaaa21498933ea694f116fe, type: 3}
+  - name: Battle2
+    clip: {fileID: 8300000, guid: 864ff2eee02b0a7479825050ceb43cb1, type: 3}
+  - name: Battle3
+    clip: {fileID: 8300000, guid: ae39ccf9d8bac0b4dafe70aad9fdd197, type: 3}
+  - name: OverWin
+    clip: {fileID: 8300000, guid: 26041eaa43f680d4985ccd3020e6047b, type: 3}
+  - name: OverLose
+    clip: {fileID: 8300000, guid: 16e7ae77b0bb02444bb9cf9da8ddaad9, type: 3}
+  sfxs:
+  - name: Coin
+    clip: {fileID: 8300000, guid: e887bfebef6ab8841a9892b7789ead4f, type: 3}
+  - name: Hit1
+    clip: {fileID: 8300000, guid: c5830b030ba691e4495057221d9f8e78, type: 3}
+  - name: Hit2
+    clip: {fileID: 8300000, guid: cdc0967a59c18aa46af41a93a6b0f55b, type: 3}
+  - name: Hit3
+    clip: {fileID: 8300000, guid: dfabafff72c3c1249bbef57e8e2be321, type: 3}
+  - name: PDeath
+    clip: {fileID: 8300000, guid: 0ee62b64d099d494eb3fabc1cd46fe08, type: 3}
+  - name: MDeath1
+    clip: {fileID: 8300000, guid: d368cb5678098224c9b05230b51b5cb0, type: 3}
+  - name: MDeath2
+    clip: {fileID: 8300000, guid: 869a9ea4174138d4f96509f92a092fb4, type: 3}
+  - name: MDeath3
+    clip: {fileID: 8300000, guid: 869a9ea4174138d4f96509f92a092fb4, type: 3}
+  - name: Immotal
+    clip: {fileID: 8300000, guid: f3c0f1b78f34c9f49b5678e71e485731, type: 3}
+  - name: Hp
+    clip: {fileID: 8300000, guid: d9fc247968203ce4cbea5c945ecc7b0d, type: 3}
+  - name: Magnet
+    clip: {fileID: 8300000, guid: 5dc569bebcc67684dae6eb361527e054, type: 3}
+  playingSfxNames: []
+  sfxBufferSize: 9

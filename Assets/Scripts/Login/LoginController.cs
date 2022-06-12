@@ -30,7 +30,25 @@ public class LoginController : MonoBehaviour
 
     public void Start()
     {
-        Screen.SetResolution(1280, 720, false);
+        SetResol(0);
+    }
+    public void SetResol(int i)
+    {
+        switch (i)
+        {
+            case 0:
+                Screen.SetResolution(1280, 720, false);
+                break;
+            case 1:
+                Screen.SetResolution(1920, 1080, false);
+                break;
+        }
+    }
+    public void Awake()
+    {
+        AudioManager.Instance.PlayBGM("Lobby");
+        FindObjectOfType<Slider>().onValueChanged.AddListener(SetVolume);
+        FindObjectOfType<Dropdown>().onValueChanged.AddListener(SetResol);
     }
 
     public void OnClick_PopupActive(string input)
@@ -73,6 +91,11 @@ public class LoginController : MonoBehaviour
     {
         _loginPopup.SetActive(false);
         _signupPopup.SetActive(false);
+    }
+
+    public void SetVolume(float value)
+    {
+        AudioListener.volume = value;
     }
 
 }
