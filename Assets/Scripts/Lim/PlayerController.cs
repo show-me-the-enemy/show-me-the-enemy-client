@@ -88,7 +88,6 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     }
     public void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log(col);
         if (col.tag == "Coin")
         {
             Coin c = col.GetComponent<Coin>();

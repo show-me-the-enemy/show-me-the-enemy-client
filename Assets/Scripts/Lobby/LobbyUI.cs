@@ -15,6 +15,7 @@ public class LobbyUI : MonoBehaviour,System.IDisposable
         NotificationCenter.Instance.AddObserver(OnUpdateRanking, ENotiMessage.TopTenUsersRankResponse);
         NetworkManager.Instance.GetTopTenRaking();
         NetworkManager.Instance.UpdateUserInfo();
+        AudioManager.Instance.PlayBGM("Main");
     }
 
     public void OnUpdatePlayerData(Notification noti)

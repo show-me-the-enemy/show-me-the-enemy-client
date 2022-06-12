@@ -2,8 +2,6 @@
 //#define BATTLE_TEST
 // 대신 project setting->player->other->ScriptingDefine
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -260,6 +258,8 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
+            AudioManager.Instance.PlayBGM("Battle" + Random.Range(1, 4));
+
             foreach (BaseElement.IBaseController ba in _controller._app.contollers)
             {
                 if (ba != null) ba.Set();
@@ -370,6 +370,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 
         public void Set()
         {
+            AudioManager.Instance.PlayBGM("Buildup");
             sendMsgs.Clear();
             _controller.buildupManager.gameObject.SetActive(true);
             _controller.buildupManager.updateItems();
@@ -447,6 +448,14 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _controller.overPopup.gameObject.SetActive(true);
             int round = _controller.gameModel.round;
             bool isWin = _controller.isWin;
+            if (isWin)
+            {
+                AudioManager.Instance.PlayBGM("OverWin");
+            }
+            else
+            {
+                AudioManager.Instance.PlayBGM("OverLose");
+            }
             int crystal = (isWin) ? round * 100 : 100;
 #if BATTLE_TEST
 #else
