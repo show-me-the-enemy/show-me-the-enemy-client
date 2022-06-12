@@ -46360,13 +46360,15 @@ MonoBehaviour:
   buyLevel: 0
   coinAmout: 0
   roundInfos:
-  - battleTime: 10
-    buildupTime: 12
   - battleTime: 14
     buildupTime: 12
-  - battleTime: 16
-    buildupTime: 12
   - battleTime: 18
+    buildupTime: 12
+  - battleTime: 22
+    buildupTime: 12
+  - battleTime: 24
+    buildupTime: 12
+  - battleTime: 26
     buildupTime: 12
 --- !u!1 &1760977475
 GameObject:

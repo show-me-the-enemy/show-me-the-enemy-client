@@ -81,16 +81,17 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
             GetComponent<SpriteRenderer>().DOKill();
         }
         isImmotal = true;
-        GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 0, 1), itemImmotalTime).SetEase(Ease.Flash, itemImmotalTime * 10).OnComplete(() =>
+        GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 0, 1), itemImmotalTime).SetEase(Ease.Flash, itemImmotalTime * 10).SetLink(gameObject).OnComplete(() =>
         {
             isImmotal = false;
         });
     }
     public void ToggleCheatImmotal()
     {
+        const int imSec = 20 * 60;//20분
         isImmotal = !isImmotal;
         if(isImmotal)
-            GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 0, 1), 120).SetEase(Ease.Flash, 120*10);
+            GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 0, 1), imSec).SetEase(Ease.Flash, imSec * 10).SetLink(gameObject);
         else
         {
             StopCoroutine(SetImmotal(defaultImmotalTime));
@@ -126,7 +127,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
         IWeapon w = weaponManager.GetWeapon("Whip");
         w.AddLevel(); // 하면 무기에서 플레이어 참조해서 무기 추가해줌 쓰레기코드임.. ㅈㅅ
         AddWeapon(w);
-        hp = maxHp;
+        //hp = maxHp;
         rb = GetComponent<Rigidbody2D>();
     }
     public void AdvanceTime(float dt_sec)

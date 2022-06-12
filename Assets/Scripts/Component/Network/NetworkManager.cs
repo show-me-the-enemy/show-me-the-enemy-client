@@ -182,7 +182,6 @@ public class NetworkManager : MonoBehaviour
         req.won = !_isIngameDie;
         req.crystal = crystal;
         req.numRound = round;
-        Debug.LogError("GameResult");
         StartCoroutine(API_GameResult(req, () =>
          {
              //SceneManager.LoadScene("LobbyScene");
@@ -244,7 +243,7 @@ public class NetworkManager : MonoBehaviour
                 _username = userRequest.username;
                 _password = userRequest.password;
                 string json = JsonUtility.ToJson(res);
-                Debug.Log(json);
+                //Debug.Log(json);
                 callback(request);
             }
         }

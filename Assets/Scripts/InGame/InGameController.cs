@@ -280,7 +280,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             string[] bisicMobs = {"Air","Bat", "BatSmall"};
             foreach (string name in mg.mobNames)
             {
-                int genCount = 1 * bt + _controller.addMobCount[name];
+                int genCount = 2 * bt + _controller.addMobCount[name];
                 mg.SetMobNum(name, genCount);
             }
             mg.SetMobNum("Bread", _controller.addMobCount["Bread"]);
