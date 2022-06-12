@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Monster : BaseElement, BaseElement.IBaseController
 {
-    private string name;
+    public string mobName;
     public InGameController gameCtrl;
     public Transform player;
     public float speed = 5;
@@ -55,7 +55,8 @@ public class Monster : BaseElement, BaseElement.IBaseController
         hp = -1;
         rb.velocity = Vector2.zero;
         animator.SetTrigger("Death");
-        gameCtrl.killMobCount[name]++;
+        Debug.Log(mobName);
+        gameCtrl.killMobCount[mobName]++;
         AudioManager.Instance.PlaySFX("MDeath" + Random.Range(1, 4));
     }
     public void AttackPlayer(PlayerController p)

@@ -117,7 +117,11 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                     break;
             }
         }
-        if (msg != "") buildupManager.AddRogText(msg);
+        if (msg != "")
+        {
+            buildupManager.AddRogText(sender + " " + type + " " + name);
+            buildupManager.AddRogText(msg);
+        }
     }
 
     private void OnNotification(Notification noti)
@@ -175,7 +179,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             IInGameStateHandler enterHandler = GetStateHandler(_currentState);
             if (enterHandler != null)
             {
-                Debug.Log("Change state to "+enterHandler);
                 enterHandler.Set();
             }
         }

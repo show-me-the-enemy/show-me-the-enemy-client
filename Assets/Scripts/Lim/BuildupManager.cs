@@ -132,7 +132,6 @@ public class BuildupManager : MonoBehaviour
 
     public void AddRogText(string log)
     {
-        logs.Add(log);
         logText.text = logText.text + log + "\n";
         scrollbar.value = 1;
     }
