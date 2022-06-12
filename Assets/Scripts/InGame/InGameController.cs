@@ -491,7 +491,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             {
                 AudioManager.Instance.PlayBGM("OverLose");
             }
-            int crystal = (isWin) ? round * 100 : 100;
+            int crystal = (isWin) ? round * 100 : 0;
 #if BATTLE_TEST
 #else
             NetworkManager.Instance.GameResult(round, crystal);
