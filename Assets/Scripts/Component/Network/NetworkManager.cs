@@ -512,25 +512,28 @@ public class NetworkManager : MonoBehaviour
         StompMessageSerializer serializer = new StompMessageSerializer();
 
         var msg = serializer.Deserialize(e.Data);
+        var headers = msg.Headers;
+        var body = msg.Body;
+        var command = msg.Command;
         Debug.Log("receive msg");
-        switch (msg.Command)
+        switch (command)
         {
             case "CONNECTED":
                 break;
             case "MESSAGE":
-                if (msg.Headers["game-status"] == "start")
+                if (headers["game-status"] == "start")
                 {
                     _isGameReady = true;
-                    InGameStatusResponse res = JsonUtility.FromJson<InGameStatusResponse>(msg.Body);
+                    InGameStatusResponse res = JsonUtility.FromJson<InGameStatusResponse>(body);
                     _seccondusername = res.secondUsername;//입장하는사람
                 }
-                else if (msg.Headers["game-status"] == "finish")
+                else if (headers["game-status"] == "finish")
                 {
                     NotificationCenter.Instance.PostNotification(ENotiMessage.InGameFinishResponse);
                 }
                 else
                 {
-                    InGameBuildUpResponse res = JsonUtility.FromJson<InGameBuildUpResponse>(msg.Body);
+                    InGameBuildUpResponse res = JsonUtility.FromJson<InGameBuildUpResponse>(body);
                     Hashtable sendData = new Hashtable();
                     sendData.Add(EDataParamKey.InGameBuildUpResponse, res);
                     NotificationCenter.Instance.PostNotification(ENotiMessage.InGameBuildUpResponse, sendData);
