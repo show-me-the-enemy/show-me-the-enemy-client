@@ -90,11 +90,11 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             switch (type)
             {
                 case "monster":
-                    msg = "상대에게 " + name + "을 소환합니다.";
+                    msg = "Send the " + name + "to "+oppositeId;
                     break;
                 case "weapon":
                 case "accessory":
-                    msg = name + "을 구매했습니다.";
+                    msg = "Purchase the "+name + ".";
                     break;
             }
             if (msg != "") msg = "<color=cyan>" + msg + "</color>";
@@ -104,16 +104,16 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             switch (type)
             {
                 case "monster":
-                    msg = oppositeId + "가 나에게 " + name + "을 소환했습니다.";
+                    msg = "Received the " + name + " from " +oppositeId;
                     addMobCount[name]+=count;
                     break;
                 case "kill":
-                    msg = oppositeId+"가 " + name + "을 " + count + "마리 죽였습니다.";
+                    msg = oppositeId+" killed the" + count + " " + name + "s.";
                     addMobCount[name] += count / 4;
                     break;
                 case "weapon":
                 case "accessory":
-                    msg = oppositeId+"가" + name + "을 구매했습니다.";
+                    msg = oppositeId+" purchased the" + name + ".";
                     break;
             }
             if (msg != "") msg = "<color=magenta>" + msg + "</color>";
@@ -231,7 +231,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         {
             _controller.myId = NetworkManager.Instance.UserName;
             _controller.oppositeId = NetworkManager.Instance.SeccondUserName;
-            _controller.buildupManager.AddRogText(_controller.oppositeId + "와 연결됐다.");
+            _controller.buildupManager.AddRogText("Connected with "+_controller.oppositeId);
             _controller._app.View.LoadingPopup.SetActive(false);
         }
 

@@ -17,7 +17,7 @@ public class GroundItem : MonoBehaviour
         {
             case 0:
                 AudioManager.Instance.PlaySFX("Hp");
-                player.Heal(20);
+                player.Heal(50);
                 break;
             case 1:
                 AudioManager.Instance.PlaySFX("Magnet");
