@@ -10,11 +10,11 @@ public class BuildupManager : MonoBehaviour
     public PlayerController player;
     public Text logText;
 
-    List<string> logs = new List<string>();
     WeaponManager weaponManager;
     AccessoryManager accessoryManager;
     [HideInInspector]
     public bool isPurchase = false;
+    List<string> logs = new List<string>();
 
     List<IWeapon> weapons = new List<IWeapon>();
     List<IAccessory> accessories = new List<IAccessory>();
@@ -137,6 +137,9 @@ public class BuildupManager : MonoBehaviour
 
     public void AddRogText(string log)
     {
-        logText.text = log + "\n" + logText.text;
+        Debug.LogError("제발 " + log);
+        string additionLog = log + "\n" + logText.text;
+        logText.text = log; //"asdf"; // 그냥 문자열은 예외 발생 안함.
+        Debug.LogError("여기만 넘자");
     }
 }

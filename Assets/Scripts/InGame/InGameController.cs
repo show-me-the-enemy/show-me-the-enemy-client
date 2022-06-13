@@ -28,6 +28,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     public string myId = "";
     [HideInInspector]
     public bool goDeath = false;
+    bool oFinish = false;
     #endregion
 
     public void Init()
@@ -97,7 +98,10 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                     msg = "Purchase the "+name + ".";
                     break;
             }
-            if (msg != "") msg = "<color=cyan>" + msg + "</color>";
+            if (msg != "")
+            {
+                msg = "<color=cyan>" + msg + "</color>";
+            }
         }
         else
         {
@@ -109,14 +113,23 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                     break;
                 case "kill":
                     msg = oppositeId+" killed the" + count + " " + name + "s.";
-                    addMobCount[name] += count / 4;
+                    addMobCount[name] += (int)(count / 4);
                     break;
                 case "weapon":
                 case "accessory":
                     msg = oppositeId+" purchased the" + name + ".";
                     break;
             }
-            if (msg != "") msg = "<color=magenta>" + msg + "</color>";
+            if (msg != "")
+            {
+                msg = "<color=magenta>" + msg + "</color>";
+            }
+
+            if (type == "Finish")
+            {
+                buildupManager.AddRogText("sync with " + oppositeId);
+                oFinish = true;
+            }
         }
         if (msg != "")
         {
@@ -129,9 +142,11 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         switch (noti.msg)
         {
             case ENotiMessage.InGameStartResponse:
+                InGameStatusResponse statusRes = (InGameStatusResponse)noti.data[EDataParamKey.InGameStatusResponseP];
+                oppositeId = statusRes.secondUsername;
                 break;
             case ENotiMessage.InGameBuildUpResponse: 
-                InGameBuildUpResponse buildUpRes = (InGameBuildUpResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
+                InGameBuildUpResponse buildUpRes = (InGameBuildUpResponse)noti.data[EDataParamKey.InGameBuildUpResponseP];
                 string sender = buildUpRes.sender;
                 string type = buildUpRes.type;
                 string name = buildUpRes.name;
@@ -230,7 +245,9 @@ public class InGameController : BaseElement, BaseElement.IBaseController
         public void Dispose()
         {
             _controller.myId = NetworkManager.Instance.UserName;
-            _controller.oppositeId = NetworkManager.Instance.SeccondUserName;
+            if (_controller.oppositeId == "")
+                _controller.oppositeId = NetworkManager.Instance.SeccondUserName;
+
             _controller.buildupManager.AddRogText("Connected with "+_controller.oppositeId);
             _controller._app.View.LoadingPopup.SetActive(false);
         }
@@ -360,7 +377,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
     {
         private float _currentUpgradeTime = 0;
         private InGameController _controller;
-        private bool oppositeFinish = false;
         private bool imFinish = false;
 
         //빌드업 MonstersList
@@ -379,24 +395,13 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             _controller.buildupManager.updateItems();
             _currentUpgradeTime = 0;
             _controller.hudController.UpdateCoinBar(false);
-            oppositeFinish = false;
+            _controller.oFinish = false;
             imFinish = false;
-            NotificationCenter.Instance.AddObserver(OnNotification, ENotiMessage.InGameBuildUpResponse);
         }
 
         public void OnNotification(Notification noti)
         {
-            if(noti.msg==ENotiMessage.InGameBuildUpResponse)
-            {
-                InGameBuildUpResponse buildUpRes = (InGameBuildUpResponse)noti.data[EDataParamKey.InGameBuildUpResponse];
-                string sender = buildUpRes.sender;
-                string type = buildUpRes.type;
-                if(sender == _controller.oppositeId && type == "Finish")
-                {
-                    _controller.buildupManager.AddRogText("sync with "+_controller.oppositeId);
-                    oppositeFinish = true;
-                }
-            } 
+            
         }
 
         public void AdvanceTime(float dt_sec)
@@ -415,7 +420,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
 #else
             if (_currentUpgradeTime > _controller.gameModel.GetBuildupTime())
             {
-                if (oppositeFinish && imFinish)
+                if (_controller.oFinish && imFinish)
                 {
                     _controller.ChangeState(EInGameState.BATTLE);
                 }

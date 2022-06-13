@@ -46,10 +46,10 @@ public class AudioManager : MonoBehaviour
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
-
         bgmAS = gameObject.AddComponent<AudioSource>();
         bgmAS.loop = true;
         bgmAS.playOnAwake = false;
+        bgmAS.volume = 0;
 
         sfxASs = new AudioSource[sfxBufferSize];
         for (int i = 0; i < sfxBufferSize; i++)
@@ -86,7 +86,7 @@ public class AudioManager : MonoBehaviour
     }
     public void PlayBGM(string name, float v=1)
     {
-        bgmAS.volume = v;
+        //bgmAS.volume = v;
         for (int i = 0; i < bgms.Length; i++)
         {
             if (name == bgms[i].name)

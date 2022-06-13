@@ -435,7 +435,7 @@ public class NetworkManager : MonoBehaviour
                 TopTenUsersRankResponse res = JsonUtility.FromJson<TopTenUsersRankResponse>(tempStr);
 
                 Hashtable sendData = new Hashtable();
-                sendData.Add(EDataParamKey.TopTenUsersRankResponse, res);
+                sendData.Add(EDataParamKey.TopTenUsersRankResponseP, res);
                 NotificationCenter.Instance.PostNotification(ENotiMessage.TopTenUsersRankResponse, sendData);
             }
         }
@@ -499,44 +499,47 @@ public class NetworkManager : MonoBehaviour
 
     private void ws_OnOpen(object sender, EventArgs e)
     {
-        Debug.Log(DateTime.Now.ToString() + " ws_OnOpen says: " + e.ToString());
+        Debug.LogError(DateTime.Now.ToString() + " ws_OnOpen says: " + e.ToString());
     }
     private void ws_OnError(object sender, ErrorEventArgs e)
     {
-        Debug.Log(DateTime.Now.ToString() + " ws_OnError says: " + e.Message);
+        Debug.LogError(DateTime.Now.ToString() + " ws_OnError says: " + e.Message);
     }
 
     private void ws_OnMessage(object sender, MessageEventArgs e)
     {
-        //Debug.Log("-----------------------------");
         StompMessageSerializer serializer = new StompMessageSerializer();
 
         var msg = serializer.Deserialize(e.Data);
         var headers = msg.Headers;
         var body = msg.Body;
         var command = msg.Command;
-        Debug.Log("receive msg");
         switch (command)
         {
             case "CONNECTED":
+                Debug.LogError("receive connected");
                 break;
             case "MESSAGE":
                 if (headers["game-status"] == "start")
                 {
                     _isGameReady = true;
                     InGameStatusResponse res = JsonUtility.FromJson<InGameStatusResponse>(body);
-                    _seccondusername = res.secondUsername;//입장하는사람
+                    Hashtable sendData = new Hashtable();
+                    sendData.Add(EDataParamKey.InGameStatusResponseP, res);
+                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameStartResponse, sendData);
+                    Debug.LogError("start OK!");
                 }
                 else if (headers["game-status"] == "finish")
                 {
                     NotificationCenter.Instance.PostNotification(ENotiMessage.InGameFinishResponse);
                 }
-                else
+                else //if(headers["game-status"] == "buildup")
                 {
                     InGameBuildUpResponse res = JsonUtility.FromJson<InGameBuildUpResponse>(body);
                     Hashtable sendData = new Hashtable();
-                    sendData.Add(EDataParamKey.InGameBuildUpResponse, res);
-                    NotificationCenter.Instance.PostNotification(ENotiMessage.InGameBuildUpResponse, sendData);
+                    sendData.Add(EDataParamKey.InGameBuildUpResponseP, res);
+                    Notification noti = new Notification(ENotiMessage.InGameBuildUpResponse, sendData);
+                    NotificationCenter.Instance.PostNotification(noti);
                 }
 
                 //foreach(var h in msg.Headers.Keys)

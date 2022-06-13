@@ -31,7 +31,7 @@ public class LobbyUI : MonoBehaviour,System.IDisposable
     public void OnUpdateRanking(Notification noti)
     {
         string tempTxt = "";
-        TopTenUsersRankResponse request = noti.data[EDataParamKey.TopTenUsersRankResponse] as TopTenUsersRankResponse;
+        TopTenUsersRankResponse request = noti.data[EDataParamKey.TopTenUsersRankResponseP] as TopTenUsersRankResponse;
         foreach (var info in request.Items)
         {
             tempTxt+= info.rank + ". "+info.username+"\n < numWins: "+info.numWins + " , maxRound: " + info.maxRound + " >\n\n";

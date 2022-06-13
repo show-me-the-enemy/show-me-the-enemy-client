@@ -60,7 +60,10 @@ public class NotificationCenter : MonoBehaviour
 
         List<DelFunction> notifyList = _notifications[msg] as List<DelFunction>;
 
-        if (!notifyList.Contains(observer)) { notifyList.Add(observer); }
+        if (!notifyList.Contains(observer)) 
+        {
+            notifyList.Add(observer); 
+        }
     }
     #endregion
 
@@ -105,7 +108,6 @@ public class NotificationCenter : MonoBehaviour
         }
 
         List<DelFunction> observersToRemove = new List<DelFunction>();
-
         foreach (DelFunction observer in notifyList)
         {
             if (observer == null)
@@ -198,8 +200,8 @@ public enum EDataParamKey
     UserSignUpRequest, //UserSignUp class 보낼때
 
     //Response 관련
-    InGameStatusResponse,
-    InGameBuildUpResponse,
-    TopTenUsersRankResponse,
+    InGameStatusResponseP,
+    InGameBuildUpResponseP,
+    TopTenUsersRankResponseP,
     
 }
