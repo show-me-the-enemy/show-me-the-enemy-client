@@ -112,7 +112,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                     addMobCount[name]+=count;
                     break;
                 case "kill":
-                    msg = oppositeId+" killed the" + count + " " + name + "s.";
+                    msg = oppositeId+" killed " + count + " " + name + "s.";
                     addMobCount[name] += (int)(count / 4);
                     break;
                 case "weapon":
@@ -154,7 +154,6 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 ReceiveBUR(sender, type, name, count);
                 break;
             case ENotiMessage.InGameFinishResponse:
-                Debug.Log("receive Death");
                 goDeath = true;
                 break;
         }
@@ -249,6 +248,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
                 _controller.oppositeId = NetworkManager.Instance.SeccondUserName;
 
             _controller.buildupManager.AddRogText("Connected with "+_controller.oppositeId);
+            _controller.hudController.SetPlayerName(_controller.myId);
             _controller._app.View.LoadingPopup.SetActive(false);
         }
 
@@ -411,6 +411,7 @@ public class InGameController : BaseElement, BaseElement.IBaseController
             float percent = 1 - _currentUpgradeTime / _controller.gameModel.GetBuildupTime();
             float remainTime = _controller.gameModel.GetBuildupTime()-_currentUpgradeTime;
             _controller.hudController.SetTimeBar(percent, remainTime);
+            _controller.buildupManager.AdvanceTime(dt_sec);
 
 #if BATTLE_TEST
             if (_currentUpgradeTime > _controller.gameModel.GetBuildupTime())

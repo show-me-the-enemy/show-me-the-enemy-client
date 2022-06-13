@@ -55,6 +55,7 @@ public class Monster : BaseElement, BaseElement.IBaseController
         hp = -1;
         rb.velocity = Vector2.zero;
         animator.SetTrigger("Death");
+        gameObject.tag = "Death";
         gameCtrl.killMobCount[mobName]++;
         AudioManager.Instance.PlaySFX("MDeath" + Random.Range(1, 4));
     }

@@ -32,6 +32,7 @@ public class PlayerController : BaseElement, BaseElement.IBaseController
     {
         hp += amount;
         if(hp > maxHp)hp = maxHp;
+        hpBar.setValue(hp / maxHp);
     }
     public void GetAllCoins()
     {

@@ -14,7 +14,7 @@ public class BuildupManager : MonoBehaviour
     AccessoryManager accessoryManager;
     [HideInInspector]
     public bool isPurchase = false;
-    List<string> logs = new List<string>();
+    string tempLog="";
 
     List<IWeapon> weapons = new List<IWeapon>();
     List<IAccessory> accessories = new List<IAccessory>();
@@ -83,15 +83,14 @@ public class BuildupManager : MonoBehaviour
     }
     public void ItemOnClick(int idx)
     {
-        if (!gameModel.Purchase(gameModel.GetBuildupItemPrice())) return;
         string type, name;
-
-        buildupItems[idx].SetPurchaseCompleted();
+        int oriIdx = idx;
         if (idx < weapons.Count)
         {
             IWeapon w = weapons[idx];
             type = "weapon";
             name = w.title;
+            if (!gameModel.Purchase(gameModel.GetBuildupItemPrice())|| w.levelInfos.Length-1 <= w.level) return;
             int lev = w.AddLevel();
             if (lev == 1) player.AddWeapon(w);
         }
@@ -101,8 +100,10 @@ public class BuildupManager : MonoBehaviour
             IAccessory a = accessories[idx];
             type = "accessory";
             name = a.title;
-            accessories[idx].AddLevel();
+            if (!gameModel.Purchase(gameModel.GetBuildupItemPrice())|| a.levelInfos.Length-1 <= a.level) return;
+            a.AddLevel();
         }
+        buildupItems[oriIdx].SetPurchaseCompleted();
         isPurchase = true;
 
 #if BATTLE_TEST
@@ -134,12 +135,29 @@ public class BuildupManager : MonoBehaviour
         NetworkManager.Instance.SendBuildUpMsg(type, name, count);
 #endif
     }
-
+    
+    public void AdvanceTime(float dt_sec)
+    {
+        if(tempLog != "")
+        {
+            logText.text = tempLog;
+            tempLog = "";
+        }
+    }
+    // 12 hours of painfull.12 hours of painfull.12 hours of painfull.
+    // 12 hours of painfull.12 hours of painfull.12 hours of painfull.
+    // 12 hours of painfull.12 hours of painfull.12 hours of painfull.
+    // 12 hours of painfull.12 hours of painfull.12 hours of painfull.
+    // 12 hours of painfull.12 hours of painfull.12 hours of painfull.
+    // 12 hours of painfull.12 hours of painfull.12 hours of painfull.
+    // 12 hours of painfull.12 hours of painfull.12 hours of painfull.
+    string GetAdditionLog(string add)
+    {
+        if (tempLog != "") return add + "\n" + tempLog;
+        else return add + "\n" + logText.text;
+    }
     public void AddRogText(string log)
     {
-        Debug.LogError("제발 " + log);
-        string additionLog = log + "\n" + logText.text;
-        logText.text = log; //"asdf"; // 그냥 문자열은 예외 발생 안함.
-        Debug.LogError("여기만 넘자");
+        tempLog = GetAdditionLog(log);
     }
 }

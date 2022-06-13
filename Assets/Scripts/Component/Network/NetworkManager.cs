@@ -499,7 +499,7 @@ public class NetworkManager : MonoBehaviour
 
     private void ws_OnOpen(object sender, EventArgs e)
     {
-        Debug.LogError(DateTime.Now.ToString() + " ws_OnOpen says: " + e.ToString());
+        Debug.Log(DateTime.Now.ToString() + " ws_OnOpen says: " + e.ToString());
     }
     private void ws_OnError(object sender, ErrorEventArgs e)
     {
@@ -517,7 +517,7 @@ public class NetworkManager : MonoBehaviour
         switch (command)
         {
             case "CONNECTED":
-                Debug.LogError("receive connected");
+                Debug.Log("receive connected");
                 break;
             case "MESSAGE":
                 if (headers["game-status"] == "start")
@@ -527,7 +527,6 @@ public class NetworkManager : MonoBehaviour
                     Hashtable sendData = new Hashtable();
                     sendData.Add(EDataParamKey.InGameStatusResponseP, res);
                     NotificationCenter.Instance.PostNotification(ENotiMessage.InGameStartResponse, sendData);
-                    Debug.LogError("start OK!");
                 }
                 else if (headers["game-status"] == "finish")
                 {
@@ -558,7 +557,6 @@ public class NetworkManager : MonoBehaviour
 
     public void SendBuildUpMsg(string typeStr, string nameStr, int countInt)
     {
-        Debug.Log("send Build up msg," +typeStr+"/"+ nameStr + "/" + countInt);
         StompMessageSerializer serializer = new StompMessageSerializer();
         var request = new InGameBuildUpRequest() { id = _currentRoomId, sender = _username, type = typeStr,name = nameStr, count = countInt };
         var broad = new StompMessage("SEND", JsonUtility.ToJson(request));

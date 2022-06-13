@@ -49,7 +49,7 @@ public class AudioManager : MonoBehaviour
         bgmAS = gameObject.AddComponent<AudioSource>();
         bgmAS.loop = true;
         bgmAS.playOnAwake = false;
-        bgmAS.volume = 0;
+        bgmAS.volume = 0.75f;
 
         sfxASs = new AudioSource[sfxBufferSize];
         for (int i = 0; i < sfxBufferSize; i++)
